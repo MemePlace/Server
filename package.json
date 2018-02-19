@@ -7,5 +7,10 @@
   "devDependencies": {
     "eslint": "^4.18.0",
     "eslint-config-google": "^0.9.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/SENG513/Server"
+  },
+  "license": "UNLICENSED"
 }
