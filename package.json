@@ -2,7 +2,9 @@
   "name": "Meme-Server",
   "version": "0.0.1",
   "dependencies": {
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "sequelize": "^4.36.1",
+    "sqlite3": "^3.1.13"
   },
   "devDependencies": {
     "eslint": "^4.18.0",
