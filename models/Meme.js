@@ -6,7 +6,6 @@ module.exports = (sequelize, DataTypes) => {
 
     Meme.associate = function(models) {
         models.Meme.belongsTo(models.User);
-        models.Meme.hasMany(models.Vote);
         models.Meme.belongsTo(models.Template);
         models.Meme.belongsTo(models.Community);
     };
