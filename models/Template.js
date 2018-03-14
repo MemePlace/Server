@@ -1,8 +1,21 @@
 module.exports = (sequelize, DataTypes) => {
     const Template = sequelize.define('Template', {
-        title: DataTypes.STRING,
-        link: DataTypes.STRING,
-        state: DataTypes.JSON,
+        title: {
+            type: DataTypes.STRING,
+            validate: {
+                len: [1, 100]
+            }
+        },
+        previewLink: {
+            type: DataTypes.STRING,
+            validate: {
+                isUrl: true
+            }
+        },
+        serialized: {
+            type: DataTypes.JSON,
+            allowNull: false
+        },
     });
 
     Template.associate = function(models) {
