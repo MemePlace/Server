@@ -25,7 +25,6 @@ router.post('/', (req, res) => {
         // Only send back the user id and username
         res.json((({id, username}) => ({id, username}))(user));
     }).catch((err) => {
-        console.log(err);
         res.status(500).json({error: 'Failed to create user'});
     });
 });
