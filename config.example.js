@@ -7,8 +7,10 @@ module.exports = {
     },
     session: {
         secret: '',
-        saveUninitialized: true,
-        resave: true,
-        cookie: {},
+        saveUninitialized: false,
+        resave: false
+    },
+    bcrypt: {
+        saltRounds: 10,
     },
 };

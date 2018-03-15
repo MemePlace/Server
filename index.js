@@ -10,17 +10,13 @@ if (!config.session.secret) {
     throw new Error('You must fill in the session secret in the config')
 }
 
-if (!config.session.cookie) {
-    config.session.cookie = {};
-}
-
 if (app.get('env') === 'production') {
     app.set('trust proxy', 1);
     config.session.cookie.secure = true;
 }
 
-app.use(session(config.session));
 app.use(bodyParser.json());
+app.use(session(config.session));
 app.use('/api/v1', APIv1);
 
 const port = config.port || 3000;
