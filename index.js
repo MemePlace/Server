@@ -16,6 +16,14 @@ if (app.get('env') === 'production') {
 }
 
 app.use(bodyParser.json());
+app.use(function (error, req, res, next) {
+    if (error instanceof SyntaxError) {
+        res.status(400).json({error: 'Invalid request body structure'});
+    } else {
+        next();
+    }
+});
+
 app.use(session(config.session));
 app.use('/api/v1', APIv1);
 
