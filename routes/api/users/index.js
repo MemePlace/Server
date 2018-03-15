@@ -12,7 +12,7 @@ router.post('/', (req, res) => {
     const body = req.body;
 
     if (!body.username || !body.password || !body.email) {
-        res.status(400).json({error: 'Invalid request properties'});
+        return res.status(400).json({error: 'Invalid request properties'});
     }
 
     bcrypt.hash(body.password, config.bcrypt.saltRounds).then((hash) => {
