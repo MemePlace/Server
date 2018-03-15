@@ -6,7 +6,8 @@ module.exports = (sequelize, DataTypes) => {
             validate: {
                 is: ['^[a-z0-9_-]+$', 'i'], // Alphanumeric, _, -
                 len: [1, 25]
-            }
+            },
+            unique: true
         },
         password: {
             type: DataTypes.STRING,
@@ -17,7 +18,8 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             validate: {
                 isEmail: true
-            }
+            },
+            unique: true
         }
     });
 
