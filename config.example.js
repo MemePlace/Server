@@ -8,7 +8,7 @@ module.exports = {
     session: {
         secret: '',
         saveUninitialized: false,
-        resave: false
+        resave: false,
     },
     bcrypt: {
         saltRounds: 10,
