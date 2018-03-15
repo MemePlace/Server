@@ -6,8 +6,7 @@ module.exports = (sequelize, DataTypes) => {
             validate: {
                 is: ['^[a-z0-9_-]+$', 'i'], // Alphanumeric, _, -
                 len: [1, 25]
-            },
-            unique: true
+            }
         },
         password: {
             type: DataTypes.STRING,
@@ -21,6 +20,19 @@ module.exports = (sequelize, DataTypes) => {
             },
             unique: true
         }
+    }, {
+        indexes: [
+            {
+                name: 'unique_insensitive_username',
+                unique: true,
+                fields: [sequelize.fn('lower', sequelize.col('username'))]
+            },
+            {
+                name: 'unique_insensitive_email',
+                unique: true,
+                fields: [sequelize.fn('lower', sequelize.col('email'))]
+            }
+        ]
     });
 
     User.associate = function(models) {
