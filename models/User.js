@@ -24,8 +24,6 @@ module.exports = (sequelize, DataTypes) => {
     User.associate = function(models) {
         // Add model associations
         models.User.belongsToMany(models.Community, {as: 'Favourites', through: 'CommunityFavourites'});
-        models.User.belongsToMany(models.Meme, {through: 'MemeVotes'});
-        models.User.belongsToMany(models.Comment, {through: 'CommentVotes'});
     };
 
     return User;
