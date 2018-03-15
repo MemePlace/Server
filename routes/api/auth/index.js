@@ -7,13 +7,14 @@ const router = express.Router();
  * Authenticate user credentials
  */
 router.post('/', async (req, res) => {
-    if (!req.username || !req.password) {
+    console.log(req.username)
+    if (!req.body.username || !req.body.password) {
         return res.status(400).json({error: 'Invalid request parameters'});
     }
 
     const user = await models.User.findOne({
         where: {
-            username: req.username
+            username: req.body.username
         }
     });
 
@@ -21,7 +22,7 @@ router.post('/', async (req, res) => {
         return res.status(400).json({error: 'Invalid username'});
     }
 
-    const valid = await bcrypt.compare(req.password, user.password);
+    const valid = await bcrypt.compare(req.body.password, user.password);
 
     if (!valid) {
         return res.status(400).json({error: 'Invalid password'});
