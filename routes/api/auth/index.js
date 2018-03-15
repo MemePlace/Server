@@ -7,7 +7,6 @@ const router = express.Router();
  * Authenticate user credentials
  */
 router.post('/', async (req, res) => {
-    console.log(req.username)
     if (!req.body.username || !req.body.password) {
         return res.status(400).json({error: 'Invalid request parameters'});
     }
