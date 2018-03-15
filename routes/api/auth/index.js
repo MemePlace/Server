@@ -1,12 +1,38 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
+const models = require('../models');
 const router = express.Router();
 
 /**
  * Authenticate user credentials
  */
-router.post('/', (req, res) => {
-    res.send('Main APIv1 Page');
+router.post('/', async (req, res) => {
+    if (!req.username || !req.password) {
+        return res.status(400).json({error: 'Invalid request parameters'});
+    }
+
+    const user = await models.User.findOne({
+        where: {
+            username: req.username
+        }
+    });
+
+    if (!user) {
+        return res.status(400).json({error: 'Invalid username'});
+    }
+
+    const valid = await bcrypt.compare(req.password, user.password);
+
+    if (!valid) {
+        return res.status(400).json({error: 'Invalid password'});
+    }
+
+    // Valid credentials, log them in
+    req.session.userId = user.id;
+    req.session.username = user.username;
+    req.session.email = user.email;
+
+    res.json((({id, username}) => ({id, username}))(user));
 });
 
 /**
