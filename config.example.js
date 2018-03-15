@@ -5,4 +5,10 @@ module.exports = {
         storage: 'db.sqlite',
         database: 'memeplace',
     },
+    session: {
+        secret: '',
+        saveUninitialized: true,
+        resave: true,
+        cookie: {},
+    },
 };
