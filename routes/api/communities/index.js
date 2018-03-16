@@ -51,15 +51,53 @@ router.get('/:name', async (req, res) => {
 /**
  * Favourites community
  */
-router.put('/:name/favourite', auth.isAuthenticated, (req, res) => {
+router.put('/:name/favourite', auth.isAuthenticated, async (req, res) => {
+    // get community
+    const community = models.Community.findOne({
+        where: {
+            name: req.params.name
+        }
+    });
 
+    if (!community) {
+        return res.status(400).json({error: 'Failed to find the community'});
+    }
+
+    models.Favourite.create({
+        userId: req.session.userId,
+        communityId: community.id
+    }).then((favourite) => {
+        res.json({message: 'Successfully favourited the community'});
+    }).catch((err) => {
+        res.status(500).json({error: 'Failed to favourite the community'});
+    })
 });
 
 /**
  * Deletes community favourite
  */
 router.delete('/:name/favourite', auth.isAuthenticated, (req, res) => {
+    // get community
+    const community = models.Community.findOne({
+        where: {
+            name: req.params.name
+        }
+    });
 
+    if (!community) {
+        return res.status(400).json({error: 'Failed to find the community'});
+    }
+
+    models.Favourite.destroy({
+        where: {
+            userId: req.session.userId,
+            communityId: community.id
+        }
+    }).then(() => {
+        res.json({message: 'Successfully unfavourited the community'});
+    }).catch((err) => {
+        res.status(500).json({error: 'Failed to unfavourite the community'})
+    })
 });
 
 /**
@@ -69,6 +107,8 @@ router.get('/:name/memes', (req, res) => {
     const sort = req.query.sort || 'top';
     const after = req.query.after;
     const count = req.query.count || 10;
+
+    // TODO
 });
 
 /**
@@ -78,6 +118,8 @@ router.get('/:name/templates', (req, res) => {
     const sort = req.query.sort || 'top';
     const after = req.query.after;
     const count = req.query.count || 10;
+
+    // TODO
 });
 
 module.exports = router;
