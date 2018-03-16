@@ -30,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
 
     Community.associate = function(models) {
         models.Community.belongsTo(models.User, {as: 'creator'});
+        models.Community.hasMany(models.Favourite);
     };
 
     return Community;
