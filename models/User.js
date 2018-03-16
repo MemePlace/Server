@@ -36,6 +36,7 @@ module.exports = (sequelize, DataTypes) => {
 
     User.associate = function(models) {
         // Add model associations
+        models.User.hasMany(models.Favourite);
     };
 
     return User;
