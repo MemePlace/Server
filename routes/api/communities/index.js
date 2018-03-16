@@ -27,18 +27,21 @@ router.post('/', auth.isAuthenticated, (req, res) => {
  * Retrieves community details
  */
 router.get('/:name', async (req, res) => {
-    const community = await models.Community.findOne({
+    const community = await models.Community.findAll({
         where: {
             name: req.params.name
         },
         attributes: {
-            exclude: ['creatorId']
+            include: [[models.sequelize.fn('COUNT', models.sequelize.col('Favourites.id')), 'favourites']]
         },
         include: [{
             model: models.User,
             as: 'creator',
             attributes: ['username']
-        }]
+        }, {
+            model: models.Favourite,
+            attributes: []
+        }],
     });
 
     if (community) {
@@ -53,7 +56,7 @@ router.get('/:name', async (req, res) => {
  */
 router.put('/:name/favourite', auth.isAuthenticated, async (req, res) => {
     // get community
-    const community = models.Community.findOne({
+    const community = await models.Community.findOne({
         where: {
             name: req.params.name
         }
@@ -64,8 +67,8 @@ router.put('/:name/favourite', auth.isAuthenticated, async (req, res) => {
     }
 
     models.Favourite.create({
-        userId: req.session.userId,
-        communityId: community.id
+        UserId: req.session.userId,
+        CommunityId: community.id
     }).then((favourite) => {
         res.json({message: 'Successfully favourited the community'});
     }).catch((err) => {
@@ -76,9 +79,9 @@ router.put('/:name/favourite', auth.isAuthenticated, async (req, res) => {
 /**
  * Deletes community favourite
  */
-router.delete('/:name/favourite', auth.isAuthenticated, (req, res) => {
+router.delete('/:name/favourite', auth.isAuthenticated, async (req, res) => {
     // get community
-    const community = models.Community.findOne({
+    const community = await models.Community.findOne({
         where: {
             name: req.params.name
         }
@@ -90,8 +93,8 @@ router.delete('/:name/favourite', auth.isAuthenticated, (req, res) => {
 
     models.Favourite.destroy({
         where: {
-            userId: req.session.userId,
-            communityId: community.id
+            UserId: req.session.userId,
+            CommunityId: community.id
         }
     }).then(() => {
         res.json({message: 'Successfully unfavourited the community'});
