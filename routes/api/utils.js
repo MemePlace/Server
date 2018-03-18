@@ -1,7 +1,7 @@
 const models = require('./models');
 
 exports.getPrivateUserDetails = function(username) {
-    return models.User.find({
+    const user =  models.User.find({
         attributes: ['username'],
         where: {
             username: username
@@ -15,4 +15,10 @@ exports.getPrivateUserDetails = function(username) {
             attributes: ['CommunityId']
         }]
     });
+
+    if (user) {
+        user.dataValues.Favourites = user.dataValues.Favourites.map((favourite) => favourite.Community);
+    }
+
+    return user;
 };

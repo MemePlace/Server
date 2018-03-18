@@ -18,7 +18,6 @@ router.get('/', auth.isAuthenticated, async (req, res) => {
     }
 
     if (user) {
-        user.dataValues.Favourites = user.dataValues.Favourites.map((favourite) => favourite.Community);
         res.json(user);
     } else {
         res.status(400).json({error: 'Failed to retrieve user'});

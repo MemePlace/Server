@@ -47,7 +47,7 @@ router.post('/', async (req, res) => {
     const userDetails = await utils.getPrivateUserDetails(user.username);
 
     if (userDetails) {
-        res.json(res);
+        res.json(userDetails);
     } else {
         res.json((({id, username}) => ({id, username}))(user));
     }
