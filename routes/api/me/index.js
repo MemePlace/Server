@@ -3,6 +3,24 @@ const auth = require('../auth');
 const models = require('../models');
 const router = express.Router();
 
+router.getDetails = function(username) {
+    return models.User.find({
+        attributes: ['username'],
+        where: {
+            username: username
+        },
+        include: [{
+            model: models.Favourite,
+            include: [{
+                model: models.Community,
+                attributes: ['name', 'title']
+            }],
+            attributes: ['CommunityId']
+        }]
+    });
+};
+
+
 /**
  * Returns summarized data on the currently logged in user
  */
@@ -10,20 +28,7 @@ router.get('/', auth.isAuthenticated, async (req, res) => {
     let user;
 
     try {
-        user = await models.User.find({
-            attributes: ['username'],
-            where: {
-                username: req.session.username
-            },
-            include: [{
-                model: models.Favourite,
-                include: [{
-                    model: models.Community,
-                    attributes: ['name', 'title']
-                }],
-                attributes: ['CommunityId']
-            }]
-        });
+        user = await router.getDetails(req.session.username);
     } catch (e) {
         return res.status(500).json({error: 'Error while retrieving user'});
     }

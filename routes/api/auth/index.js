@@ -1,6 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const models = require('../models');
+const me = require('../me');
 const router = express.Router();
 
 /**
@@ -43,7 +44,13 @@ router.post('/', async (req, res) => {
     req.session.username = user.username;
     req.session.email = user.email;
 
-    res.json((({id, username}) => ({id, username}))(user));
+    const user = await me.getDetails(user.username);
+
+    if (user) {
+        res.json(res);
+    } else {
+        res.json((({id, username}) => ({id, username}))(user));
+    }
 });
 
 /**
