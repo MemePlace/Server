@@ -1,24 +1,8 @@
 const express = require('express');
 const auth = require('../auth');
 const models = require('../models');
+const utils = require('../utils');
 const router = express.Router();
-
-router.getDetails = function(username) {
-    return models.User.find({
-        attributes: ['username'],
-        where: {
-            username: username
-        },
-        include: [{
-            model: models.Favourite,
-            include: [{
-                model: models.Community,
-                attributes: ['name', 'title']
-            }],
-            attributes: ['CommunityId']
-        }]
-    });
-};
 
 
 /**
@@ -28,7 +12,7 @@ router.get('/', auth.isAuthenticated, async (req, res) => {
     let user;
 
     try {
-        user = await router.getDetails(req.session.username);
+        user = await utils.getPrivateUserDetails(req.session.username);
     } catch (e) {
         return res.status(500).json({error: 'Error while retrieving user'});
     }
