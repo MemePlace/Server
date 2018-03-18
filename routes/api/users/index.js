@@ -30,53 +30,27 @@ router.post('/', (req, res) => {
 });
 
 /**
- * Gets details about user
+ * Gets summary details about a user
  */
-router.get('/:username', auth.isAuthenticated, async (req, res) => {
-    if (req.params.username !== req.session.username) {
-        return res.status(401).json({error: 'Unauthorized access to view this resource'})
-    }
-
+router.get('/:username', async (req, res) => {
     let user;
 
     try {
         user = await models.User.find({
-            attributes: ['username'],
+            attributes: ['username', 'createdAt'],
             where: {
                 username: req.params.username
-            },
-            include: [{
-                model: models.Favourite,
-                include: [{
-                    model: models.Community,
-                    attributes: ['name', 'title']
-                }],
-                attributes: ['CommunityId']
-            }]
+            }
         });
     } catch (e) {
         return res.status(500).json({error: 'Error while retrieving user'});
     }
 
     if (user) {
-        user.dataValues.Favourites = user.dataValues.Favourites.map((favourite) => favourite.Community);
         res.json(user);
     } else {
         res.status(400).json({error: 'Failed to retrieve user'});
     }
-});
-
-/**
- * Updates user details
- */
-router.put('/:username', auth.isAuthenticated, (req, res) => {
-    // Ensure they are the user they're updating
-    if (req.session.username !== req.params.username) {
-        return res.status(401).json({error: 'Unauthorized access to update this resource'});
-    }
-
-    // TODO: Update user details
-    res.send(req.params.username);
 });
 
 module.exports = router;
