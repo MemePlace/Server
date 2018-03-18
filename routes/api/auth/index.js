@@ -36,6 +36,20 @@ router.post('/', async (req, res) => {
 });
 
 /**
+ * Logs out authenticated user
+ */
+router.put('/logout', router.isAuthenticated, async (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            res.status(500).json({error: 'Failed to logout user'});
+        }
+        else {
+            res.json({message: 'Successfully logged out user'});
+        }
+    });
+});
+
+/**
  * Middleware to check whether the user is authed
  */
 router.isAuthenticated = function(req, res, next) {
