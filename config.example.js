@@ -13,4 +13,5 @@ module.exports = {
     bcrypt: {
         saltRounds: 10,
     },
+    allowedOrigins: ['http://localhost:4200', 'http://meme.place'],
 };

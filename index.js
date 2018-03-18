@@ -23,7 +23,17 @@ app.use(function (error, req, res, next) {
         next();
     }
 });
+app.use((req, res, next) => {
+    const origin = req.get('origin');
 
+    console.log(origin);
+
+    if (!origin || (config.allowedOrigins || []).indexOf(origin) > -1) {
+        res.header('Access-Control-Allow-Origin', origin);
+    }
+
+    next();
+});
 app.use(session(config.session));
 app.use('/api/v1', APIv1);
 
