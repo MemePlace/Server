@@ -18,10 +18,19 @@ module.exports = (sequelize, DataTypes) => {
         description: DataTypes.TEXT,
         sidebar: DataTypes.TEXT,
         nsfw: DataTypes.BOOLEAN
+    }, {
+        indexes: [
+            {
+                name: 'unique_insensitive_name',
+                unique: true,
+                fields: [sequelize.fn('lower', sequelize.col('name'))]
+            }
+        ]
     });
 
     Community.associate = function(models) {
         models.Community.belongsTo(models.User, {as: 'creator'});
+        models.Community.hasMany(models.Favourite);
     };
 
     return Community;

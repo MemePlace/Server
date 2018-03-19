@@ -32,9 +32,38 @@ router.post('/', (req, res) => {
 /**
  * Gets details about user
  */
-router.get('/:username', (req, res) => {
-    // TODO: Retrieve user details (provide more details if it is the logged in user)
-    res.send(req.params.username);
+router.get('/:username', auth.isAuthenticated, async (req, res) => {
+    if (req.params.username !== req.session.username) {
+        return res.status(401).json({error: 'Unauthorized access to view this resource'})
+    }
+
+    let user;
+
+    try {
+        user = await models.User.find({
+            attributes: ['username'],
+            where: {
+                username: req.params.username
+            },
+            include: [{
+                model: models.Favourite,
+                include: [{
+                    model: models.Community,
+                    attributes: ['name', 'title']
+                }],
+                attributes: ['CommunityId']
+            }]
+        });
+    } catch (e) {
+        return res.status(500).json({error: 'Error while retrieving user'});
+    }
+
+    if (user) {
+        user.dataValues.Favourites = user.dataValues.Favourites.map((favourite) => favourite.Community);
+        res.json(user);
+    } else {
+        res.status(400).json({error: 'Failed to retrieve user'});
+    }
 });
 
 /**
