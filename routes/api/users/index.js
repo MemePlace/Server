@@ -11,8 +11,8 @@ const router = express.Router();
 router.post('/', (req, res) => {
     const body = req.body;
 
-    if (!body.username || !body.password) {
-        return res.status(400).json({error: 'Invalid request properties'});
+    if (!body.password) {
+        return res.status(400).json({error: 'You must fill in a password'});
     }
 
     bcrypt.hash(body.password, config.bcrypt.saltRounds).then((hash) => {
@@ -25,7 +25,9 @@ router.post('/', (req, res) => {
         // Only send back the user id and username
         res.json((({id, username}) => ({id, username}))(user));
     }).catch((err) => {
-        res.status(500).json({error: 'Failed to create user'});
+        const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to create user';
+
+        res.status(500).json({error: msg});
     });
 });
 
