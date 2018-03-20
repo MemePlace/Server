@@ -18,8 +18,8 @@ router.post('/', auth.isAuthenticated, (req, res) => {
     }).then((community) => {
         res.json(community);
     }).catch((err) => {
-        console.log(err);
-        res.status(400).json({error: err.toString()});
+        const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to create community';
+        res.status(400).json({error: msg});
     });
 });
 
