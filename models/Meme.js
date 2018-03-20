@@ -4,7 +4,9 @@ module.exports = (sequelize, DataTypes) => {
         link: {
             type: DataTypes.STRING,
             validate: {
-                isUrl: true
+                isUrl: {
+                    msg: 'Your URL doesn\'t look correct'
+                }
             }
         }
     });
