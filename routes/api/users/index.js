@@ -27,7 +27,7 @@ router.post('/', (req, res) => {
     }).catch((err) => {
         const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to create user';
 
-        res.status(500).json({error: msg});
+        res.status(400).json({error: msg});
     });
 });
 
