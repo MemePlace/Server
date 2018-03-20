@@ -14,5 +14,6 @@ module.exports = {
         saltRounds: 10,
     },
     allowedOrigins: ['http://localhost:4200', 'http://meme.place'],
-    ensureOrigin: false, // Whether to ensure the origin is in allowedOrigins (default DEV false, PROD true)
+    ensureOrigin: false, // Ensure origin is in allowedOrigins
+                         // (default DEV false, PROD true)
 };
