@@ -10,13 +10,20 @@ if (!config.session.secret) {
     throw new Error('You must fill in the session secret in the config')
 }
 
-if (config.ensureOrigin === undefined) {
-    config.ensureOrigin = true;
-}
-
 if (app.get('env') === 'production') {
     app.set('trust proxy', 1);
     config.session.cookie.secure = true;
+
+    // Defaults ensureOrigin to true
+    if (config.ensureOrigin === false) {
+        console.error('Warning: Origin checking should not be disabled in production');
+    }
+    else {
+        config.ensureOrigin = true;
+    }
+}
+else {
+    config.ensureOrigin = config.ensureOrigin || false;
 }
 
 app.use(bodyParser.json());
