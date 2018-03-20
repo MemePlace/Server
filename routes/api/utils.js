@@ -1,7 +1,7 @@
 const models = require('./models');
 
-exports.getPrivateUserDetails = function(username) {
-    const user =  models.User.find({
+exports.getPrivateUserDetails = async function(username) {
+    const user = await models.User.find({
         attributes: ['username'],
         where: {
             username: username
