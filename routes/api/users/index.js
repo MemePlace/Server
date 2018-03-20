@@ -11,7 +11,7 @@ const router = express.Router();
 router.post('/', (req, res) => {
     const body = req.body;
 
-    if (!body.username || !body.password || !body.email) {
+    if (!body.username || !body.password) {
         return res.status(400).json({error: 'Invalid request properties'});
     }
 
