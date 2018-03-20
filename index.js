@@ -10,6 +10,10 @@ if (!config.session.secret) {
     throw new Error('You must fill in the session secret in the config')
 }
 
+if (config.ensureOrigin === undefined) {
+    config.ensureOrigin = true;
+}
+
 if (app.get('env') === 'production') {
     app.set('trust proxy', 1);
     config.session.cookie.secure = true;
@@ -29,8 +33,10 @@ app.use((req, res, next) => {
     if (!origin || (config.allowedOrigins || []).indexOf(origin) > -1) {
         res.header('Access-Control-Allow-Origin', origin);
         next();
-    } else {
+    } else if (config.ensureOrigin) {
         res.status(400).json({error: 'Invalid request origin'});
+    } else {
+        next();
     }
 });
 app.use(session(config.session));
