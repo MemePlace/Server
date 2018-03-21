@@ -3,18 +3,29 @@ module.exports = (sequelize, DataTypes) => {
         title: {
             type: DataTypes.STRING,
             validate: {
-                len: [1, 100]
+                len: {
+                    args: [1, 100],
+                    msg: 'Your title must be between 1 and 100 characters'
+                }
             }
         },
         previewLink: {
             type: DataTypes.STRING,
             validate: {
-                isUrl: true
+                isUrl: {
+                    msg: 'Your URL doesn\'t have a proper structure'
+                }
             }
         },
         serialized: {
             type: DataTypes.JSON,
-            allowNull: false
+            allowNull: false,
+            default: '',
+            validate: {
+                notEmpty: {
+                    msg: 'You must fill in the serialized template state'
+                }
+            }
         },
     });
 
