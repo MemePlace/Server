@@ -4,7 +4,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.TEXT,
             allowNull: false,
             validate: {
-                len: [1, 10000]
+                len: {
+                    args: [1, 10000],
+                    msg: 'The comment text length must be between 1 and 10000 characters'
+                }
             }
         }
     });

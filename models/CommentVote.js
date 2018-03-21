@@ -3,7 +3,10 @@ module.exports = (sequelize, DataTypes) => {
         diff: {
             type: DataTypes.TINYINT,
             validate: {
-                isIn: [-1, 1]
+                isIn: {
+                    args: [-1, 1],
+                    msg: 'Your vote must be either -1 or 1'
+                }
             }
         }
     });
