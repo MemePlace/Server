@@ -35,14 +35,13 @@ router.post('/', (req, res) => {
  * Gets summary details about a user
  */
 router.get('/:username', async (req, res) => {
+    const username = req.params.username;
     let user;
 
     try {
         user = await models.User.find({
             attributes: ['username', 'createdAt'],
-            where: {
-                username: req.params.username
-            }
+            where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('username')), username.toLowerCase())
         });
     } catch (e) {
         return res.status(500).json({error: 'Error while retrieving user'});

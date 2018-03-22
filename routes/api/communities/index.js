@@ -27,10 +27,10 @@ router.post('/', auth.isAuthenticated, (req, res) => {
  * Retrieves community details
  */
 router.get('/:name', async (req, res) => {
+    const name = req.params.name;
+
     const community = await models.Community.findAll({
-        where: {
-            name: req.params.name
-        },
+        where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('name')), name.toLowerCase()),
         attributes: {
             include: [[models.sequelize.fn('COUNT', models.sequelize.col('Favourites.id')), 'favourites']]
         },
@@ -56,10 +56,10 @@ router.get('/:name', async (req, res) => {
  */
 router.put('/:name/favourite', auth.isAuthenticated, async (req, res) => {
     // get community
+    const name = req.params.name;
+
     const community = await models.Community.findOne({
-        where: {
-            name: req.params.name
-        }
+        where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('name')), name.toLowerCase()),
     });
 
     if (!community) {
@@ -81,10 +81,10 @@ router.put('/:name/favourite', auth.isAuthenticated, async (req, res) => {
  */
 router.delete('/:name/favourite', auth.isAuthenticated, async (req, res) => {
     // get community
+    const name = req.params.name;
+
     const community = await models.Community.findOne({
-        where: {
-            name: req.params.name
-        }
+        where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('name')), name.toLowerCase())
     });
 
     if (!community) {
