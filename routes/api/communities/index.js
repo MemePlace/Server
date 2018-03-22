@@ -29,18 +29,12 @@ router.post('/', auth.isAuthenticated, (req, res) => {
 router.get('/:name', async (req, res) => {
     const name = req.params.name;
 
-    const community = await models.Community.findAll({
+    const community = await models.Community.findOne({
         where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('name')), name.toLowerCase()),
-        attributes: {
-            include: [[models.sequelize.fn('COUNT', models.sequelize.col('Favourites.id')), 'favourites']]
-        },
         include: [{
             model: models.User,
             as: 'creator',
             attributes: ['username']
-        }, {
-            model: models.Favourite,
-            attributes: []
         }],
     });
 
@@ -95,7 +89,8 @@ router.delete('/:name/favourite', auth.isAuthenticated, async (req, res) => {
         where: {
             UserId: req.session.userId,
             CommunityId: community.id
-        }
+        },
+        individualHooks: true
     }).then(() => {
         res.json({message: 'Successfully unfavourited the community'});
     }).catch((err) => {
