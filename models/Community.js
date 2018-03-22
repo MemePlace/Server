@@ -48,7 +48,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         favourites: {
             type: DataTypes.INTEGER,
-            default: 0
+            defaultValue: 0
         },
         description: DataTypes.TEXT,
         sidebar: DataTypes.TEXT,
