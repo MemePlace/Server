@@ -24,6 +24,40 @@ router.post('/', auth.isAuthenticated, (req, res) => {
 });
 
 /**
+ * Gets lists of communities
+ */
+router.get('/', async (req, res) => {
+    const sort = (['top', 'new'].includes(req.query.sort) && req.query.sort) || 'top';
+    const count = (0 < parseInt(req.query.count) && parseInt(req.query.count) < 100) ? parseInt(req.query.count) : 10;
+    const offset = parseInt(req.query.offset) || 0;
+
+    let order;
+
+    if (sort === 'top') {
+        order = ['favourites', 'DESC']
+    }
+    else if (sort === 'new') {
+        order = ['createdAt', 'DESC'];
+    }
+
+    const totalCount = await models.Community.count();
+
+    const communities = await models.Community.findAll({
+        limit: count,
+        offset,
+        order: [order]
+    });
+
+    res.json({
+        communities,
+        totalCount,
+        offset,
+        size: communities.length,
+        sort
+    });
+});
+
+/**
  * Retrieves community details
  */
 router.get('/:name', async (req, res) => {
