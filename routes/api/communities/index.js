@@ -24,23 +24,51 @@ router.post('/', auth.isAuthenticated, (req, res) => {
 });
 
 /**
+ * Gets lists of communities
+ */
+router.get('/', async (req, res) => {
+    const sort = (['top', 'new'].includes(req.query.sort) && req.query.sort) || 'top';
+    const count = (0 < parseInt(req.query.count) && parseInt(req.query.count) < 100) ? parseInt(req.query.count) : 10;
+    const offset = parseInt(req.query.offset) || 0;
+
+    let order;
+
+    if (sort === 'top') {
+        order = ['favourites', 'DESC']
+    }
+    else if (sort === 'new') {
+        order = ['createdAt', 'DESC'];
+    }
+
+    const totalCount = await models.Community.count();
+
+    const communities = await models.Community.findAll({
+        limit: count,
+        offset,
+        order: [order]
+    });
+
+    res.json({
+        communities,
+        totalCount,
+        offset,
+        size: communities.length,
+        sort
+    });
+});
+
+/**
  * Retrieves community details
  */
 router.get('/:name', async (req, res) => {
     const name = req.params.name;
 
-    const community = await models.Community.findAll({
+    const community = await models.Community.findOne({
         where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('name')), name.toLowerCase()),
-        attributes: {
-            include: [[models.sequelize.fn('COUNT', models.sequelize.col('Favourites.id')), 'favourites']]
-        },
         include: [{
             model: models.User,
             as: 'creator',
             attributes: ['username']
-        }, {
-            model: models.Favourite,
-            attributes: []
         }],
     });
 
@@ -95,7 +123,8 @@ router.delete('/:name/favourite', auth.isAuthenticated, async (req, res) => {
         where: {
             UserId: req.session.userId,
             CommunityId: community.id
-        }
+        },
+        individualHooks: true
     }).then(() => {
         res.json({message: 'Successfully unfavourited the community'});
     }).catch((err) => {
