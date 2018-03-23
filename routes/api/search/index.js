@@ -4,10 +4,13 @@ const router = express.Router();
 const Op = models.Sequelize.Op;
 
 /**
- * Returns search query results
+ * Returns search query autocomplete results
  */
-router.get('/:query', async (req, res) => {
+router.get('/:query/autocomplete', async (req, res) => {
     const query = req.params.query;
+    let typeCount = parseInt(req.query.typeCount);
+    typeCount = (0 < typeCount && typeCount <= 10 && typeCount) || 4;
+
     const response = {};
 
     // TODO: Use a real searching library
@@ -19,14 +22,15 @@ router.get('/:query', async (req, res) => {
             username: {
                 like: `%${query}%`
             }
-        }
+        },
+        limit: typeCount
     });
 
     response.users = users;
 
     // Fetch communities corresponding to the query
     const communities = await models.Community.findAll({
-        attributes: ['name', 'title', 'favourites', 'description', 'nsfw'],
+        attributes: ['name', 'title', 'favourites', 'nsfw'],
         where: {
             [Op.or]: [
                 {name: {like: `%${query}%`}},
@@ -34,7 +38,8 @@ router.get('/:query', async (req, res) => {
                 {description: {like: `%${query}%`}}
             ]
         },
-        order: [['favourites', 'DESC']]
+        order: [['favourites', 'DESC']],
+        limit: typeCount
     });
 
     response.communities = communities;
