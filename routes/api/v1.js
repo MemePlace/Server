@@ -9,5 +9,6 @@ router.use('/auth', require('./auth'));
 router.use('/users', require('./users'));
 router.use('/communities', require('./communities'));
 router.use('/me', require('./me'));
+router.use('/search', require('./search'));
 
 module.exports = router;
