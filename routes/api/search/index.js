@@ -8,8 +8,8 @@ const Op = models.Sequelize.Op;
  */
 router.get('/:query/autocomplete', async (req, res) => {
     const query = req.params.query;
-    let typeCount = parseInt(req.query.typeCount);
-    typeCount = (0 < typeCount && typeCount <= 10 && typeCount) || 4;
+    let countPerType = parseInt(req.query.countPerType);
+    countPerType = (0 < countPerType && countPerType <= 10 && countPerType) || 4;
 
     const response = {};
 
@@ -23,7 +23,7 @@ router.get('/:query/autocomplete', async (req, res) => {
                 like: `%${query}%`
             }
         },
-        limit: typeCount
+        limit: countPerType
     });
 
     response.users = users;
@@ -39,7 +39,7 @@ router.get('/:query/autocomplete', async (req, res) => {
             ]
         },
         order: [['favourites', 'DESC']],
-        limit: typeCount
+        limit: countPerType
     });
 
     response.communities = communities;
