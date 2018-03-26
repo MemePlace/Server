@@ -40,7 +40,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Meme.associate = function(models) {
-        models.Meme.belongsTo(models.User);
+        models.Meme.belongsTo(models.User, {as: 'creator'});
         models.Meme.belongsTo(models.Template);
         models.Meme.belongsTo(models.Community);
     };
