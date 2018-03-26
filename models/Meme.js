@@ -1,8 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
     const Meme = sequelize.define('Meme', {
-        title: {
-            type: DataTypes.STRING,
-        },
+        title: DataTypes.STRING,
         link: {
             type: DataTypes.STRING,
             allowNull: false,
