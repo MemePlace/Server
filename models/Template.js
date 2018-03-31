@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Template.associate = function(models) {
-        models.Template.belongsTo(models.User, {as: 'author'});
+        models.Template.belongsTo(models.User, {as: 'creator'});
     };
 
     return Template;
