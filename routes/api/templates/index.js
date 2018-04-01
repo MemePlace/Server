@@ -32,11 +32,41 @@ router.get('/', async (req, res) => {
 
     const totalCount = await models.Template.count();
 
-    const templates = await models.Template.findAll({
-        limit: count,
-        offset,
-        order: [order]
-    });
+    let templates;
+
+    if (sort === 'new') {
+        templates = await models.Template.findAll({
+            limit: count,
+            offset,
+            order: [['createdAt', 'DESC']],
+            include: [{
+                model: models.User,
+                as: 'creator',
+                attributes: ['username']
+            }],
+        });
+    }
+    else if (sort === 'top') {
+        templates = await models.Template.findAll({
+            attributes: {
+                include: [
+                    [sequelize.fn('COUNT', sequelize.col('table2s.id')), 'count']
+                ]
+            },
+            include: [{
+                model: models.User,
+                as: 'creator',
+                attributes: ['username']
+            }, {
+                attributes: [],
+                model: models.Meme,
+                required: false
+            }],
+            limit: count,
+            offset,
+            order: [order],
+        });
+    }
 
     res.json({
         templates,
