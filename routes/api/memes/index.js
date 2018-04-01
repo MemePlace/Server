@@ -56,7 +56,6 @@ router.get('/', async (req, res) => {
         order: [order]
     });
 
-
     res.json({
         memes,
         totalCount,
@@ -70,9 +69,24 @@ router.get('/', async (req, res) => {
  * Retrieves meme details
  */
 router.get('/:memeid', async (req, res) => {
-    console.log("retrieve meme details");
-});
+    // use link to find the meme? Not sure how to use ID to find the meme..
+    const memelink = req.params.link;
 
+    const meme = await models.Meme.findOne({
+        where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('link')), memelink.toLowerCase()),
+        include: [{
+            model: models.User,
+            as: 'creator',
+            attributes: ['username']
+        }],
+    });
+
+    if (meme) {
+        res.json(meme);
+    } else {
+        res.status(400).json({error: 'Failed to find meme'});
+    }
+});
 
 /**
  * Deletes meme
@@ -94,3 +108,5 @@ router.put('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
 router.delete('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
 
 });
+
+module.exports = router;
