@@ -70,7 +70,7 @@ router.get('/', async (req, res) => {
  * Retrieves meme details
  */
 router.get('/:memeid', async (req, res) => {
-
+    console.log("retrieve meme details");
 });
 
 
