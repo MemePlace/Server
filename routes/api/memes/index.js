@@ -12,9 +12,9 @@ router.post('/', auth.isAuthenticated, (req, res) => {
         title: req.body.title,
         link: req.body.link,
         creatorId: req.session.userId,
-        templateId: req.body.templateId,
+        templateId: parseInt(req.body.templateId),
         // if user must post to community, then before they've joined any community, what do they post to?
-        communityId: req.body.communityId,
+        communityId: parseInt(req.body.communityId),
    }).then((meme) => {
        res.json(meme);                      // unsure about this... what happens if the meme is created?
    }).catch((err) => {
@@ -70,7 +70,7 @@ router.get('/', async (req, res) => {
  */
 router.get('/:memeid', async (req, res) => {
     // use link to find the meme? Not sure how to use ID to find the meme..
-    const memeId = req.id;
+    const memeId = req.params.memeid;
 
     const meme = await models.Meme.findOne({
         where: {
@@ -79,7 +79,9 @@ router.get('/:memeid', async (req, res) => {
         include: [{
             model: models.User,
             as: 'creator',
-            attributes: ['username']
+            attributes: ['username']}, {
+            model: models.Community,
+            attributes: ['name']
         }],
     });
 
