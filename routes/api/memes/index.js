@@ -12,12 +12,13 @@ router.post('/', auth.isAuthenticated, (req, res) => {
         title: req.body.title,
         link: req.body.link,
         creatorId: req.session.userId,
-        templateId: parseInt(req.body.templateId),
+        TemplateId: parseInt(req.body.templateId) || null,
         // if user must post to community, then before they've joined any community, what do they post to?
-        communityId: parseInt(req.body.communityId),
+        CommunityId: parseInt(req.body.communityId),
    }).then((meme) => {
        res.json(meme);                      // unsure about this... what happens if the meme is created?
    }).catch((err) => {
+       console.error(err);
        const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to create meme';
        res.status(400).json({error: msg});
    });
@@ -79,7 +80,8 @@ router.get('/:memeid', async (req, res) => {
         include: [{
             model: models.User,
             as: 'creator',
-            attributes: ['username']}, {
+            attributes: ['username']
+        }, {
             model: models.Community,
             attributes: ['name']
         }],
