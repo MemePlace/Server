@@ -10,5 +10,6 @@ router.use('/users', require('./users'));
 router.use('/communities', require('./communities'));
 router.use('/me', require('./me'));
 router.use('/search', require('./search'));
+router.use('/templates', require('./templates'));
 
 module.exports = router;
