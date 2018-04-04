@@ -15,6 +15,7 @@ router.post('/', auth.isAuthenticated, (req, res) => {
     }).then((template) => {
         res.json(template);
     }).catch((err) => {
+        console.error(err);
         const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to create template';
         res.status(400).json({error: msg});
     });
@@ -27,8 +28,6 @@ router.get('/', async (req, res) => {
     const sort = (['top', 'new'].includes(req.query.sort) && req.query.sort) || 'top';
     const count = (0 < parseInt(req.query.count) && parseInt(req.query.count) < 100) ? parseInt(req.query.count) : 10;
     const offset = parseInt(req.query.offset) || 0;
-
-
 
     const totalCount = await models.Template.count();
 
@@ -50,7 +49,11 @@ router.get('/', async (req, res) => {
         templates = await models.Template.findAll({
             attributes: {
                 include: [
-                    [sequelize.fn('COUNT', sequelize.col('table2s.id')), 'count']
+                    [models.sequelize.fn('COUNT', models.sequelize.col('Memes.id')), 'memeCount'],
+                ],
+                exclude: [
+                    'updatedAt',
+                    'creatorId'
                 ]
             },
             include: [{
@@ -60,11 +63,12 @@ router.get('/', async (req, res) => {
             }, {
                 attributes: [],
                 model: models.Meme,
-                required: false
+                required: false,
             }],
             limit: count,
             offset,
-            order: [order],
+            group: ['Template.id'],
+            order: models.sequelize.literal('memeCount DESC'),
         });
     }
 
