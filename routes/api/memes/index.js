@@ -125,9 +125,10 @@ router.delete('/:memeid', auth.isAuthenticated, async (req, res) => {
  * Vote for the meme
  */
 router.put('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
-    console.log("found one!");
-
     const memeId = req.params.memeid;
+    const userVote = Boolean(req.body.vote);
+
+    console.log(userVote);
 
     const meme = await models.Meme.findOne({
         where: {
@@ -135,6 +136,53 @@ router.put('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
         }
     });
 
+    if (!meme) {
+        return res.status(400).json({error: 'Failed to find this meme'});
+    }
+
+    const vote = await models.MemeVote.findOne({
+        where: {
+            MemeId: memeId,
+            UserId: req.session.userId
+        }
+    });
+
+    if (vote) {
+        if (vote.diff === userVote) {
+            res.status(401).json({error: 'You have already voted for this meme'});
+            return;
+        }
+
+        await vote.save().then(() => {
+            res.json({message: 'Updated vote status for this meme'});
+            return;
+        });
+    }
+
+    models.MemeVote.create({
+        diff: userVote,
+        MemeId: memeId,
+        UserId: req.session.userId
+    }).then((newVote) => {
+        res.json(newVote);
+    }).catch((err) => {
+        const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to vote for this meme';
+        res.status(400).json({error: msg});
+    });
+});
+
+
+/**
+ * Delete vote for the meme
+ */
+router.delete('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
+    const memeId = req.params.memeid;
+
+    const meme = await models.Meme.findOne({
+        where: {
+            id: memeId
+        }
+    });
 
     if (!meme) {
         return res.status(400).json({error: 'Failed to find this meme'});
@@ -148,21 +196,11 @@ router.put('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
         }
     });
 
-    if (vote) {
-        if (vote.diff === req.body.vote) {
-            res.status(401).json({error: 'You have already voted for this meme'});
-            return;
-        }
-
-        await vote.save();
+    if (!vote) {
+        return res.status(400).json({error: 'You\'ve never voted for this meme'});
     }
-});
 
-
-/**
- * Delete vote for the meme
- */
-router.delete('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
+    await vote.destroy();
 
 });
 
