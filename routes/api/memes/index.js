@@ -14,7 +14,7 @@ router.post('/', auth.isAuthenticated, (req, res) => {
         creatorId: req.session.userId,
         TemplateId: parseInt(req.body.templateId) || null,
         // if user must post to community, then before they've joined any community, what do they post to?
-        CommunityId: parseInt(req.body.communityId),
+        CommunityId: parseInt(req.body.communityId) || null,
    }).then((meme) => {
        res.json(meme);                      // unsure about this... what happens if the meme is created?
    }).catch((err) => {
@@ -70,7 +70,6 @@ router.get('/', async (req, res) => {
  * Retrieves meme details
  */
 router.get('/:memeid', async (req, res) => {
-    // use link to find the meme? Not sure how to use ID to find the meme..
     const memeId = req.params.memeid;
 
     const meme = await models.Meme.findOne({
@@ -98,7 +97,29 @@ router.get('/:memeid', async (req, res) => {
  * Deletes meme
  */
 router.delete('/:memeid', auth.isAuthenticated, async (req, res) => {
+    const memeId = req.params.memeid;
 
+    const meme = await models.Meme.findOne({
+        where: {
+            id: memeId,
+            creatorId: req.session.userId
+        }
+    });
+
+    if (!meme) {
+        return res.status(400).json({error: 'Failed to find this meme under current creator\'s name'});
+    }
+
+    models.Meme.destroy({
+        where: {
+            id: memeId,
+            creatorId: req.session.userId
+        }
+    }).then(() => {
+        res.json({message: 'Successfully deleted the meme'});
+    }).catch((err) => {
+        res.status(500).json({error: 'Failed to delete the meme'});
+    })
 });
 
 /**
