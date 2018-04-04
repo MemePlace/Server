@@ -22,6 +22,40 @@ router.post('/', auth.isAuthenticated, (req, res) => {
 });
 
 /**
+ * Deletes template
+ */
+router.delete('/:id', auth.isAuthenticated, async (req, res) => {
+    const id = req.params.id;
+
+    const template = await models.Template.findOne({
+        where: {
+            id
+        }
+    });
+
+    if (template.creatorId !== req.session.userId) {
+        res.status(401).json({error: 'You must be the creator of this template to delete it'});
+        return;
+    }
+
+    // Check if there is a meme that uses this template
+    const meme = await models.Meme.findOne({
+        where: {
+            TemplateId: id
+        }
+    });
+
+    if (meme) {
+        res.status(400).json({error: 'You cannot delete a template if a meme is using it'});
+        return;
+    }
+
+    await template.destroy();
+
+    res.json({message: 'Successfully deleted the template'});
+});
+
+/**
  * Gets lists of templates
  */
 router.get('/', async (req, res) => {
@@ -53,7 +87,8 @@ router.get('/', async (req, res) => {
                 ],
                 exclude: [
                     'updatedAt',
-                    'creatorId'
+                    'creatorId',
+                    'serialized'
                 ]
             },
             include: [{
@@ -88,6 +123,12 @@ router.get('/:id', async (req, res) => {
     const id = req.params.id;
 
     const template = await models.Template.findOne({
+        attributes: {
+            exclude: [
+                'updatedAt',
+                'creatorId'
+            ]
+        },
         where: {
             id
         },
@@ -114,6 +155,8 @@ router.get('/:id/memes', (req, res) => {
     const count = (0 < parseInt(req.query.count) && parseInt(req.query.count) < 100) ? parseInt(req.query.count) : 10;
 
     // TODO
+
+    res.status(500).json({error: 'Method not implemented'});
 });
 
 module.exports = router;
