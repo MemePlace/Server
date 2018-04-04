@@ -49,9 +49,9 @@ Creates a new community
 
 - `name` - Name of the community
 - `title` - Title of the community
-- `description` - Description of the community
-- `sidebar` - Sidebar text of the community
-- `nsfw` - Bool - Whether the community is NSFW
+- `description` - Optional - Description of the community
+- `sidebar` - Optional - Sidebar text of the community
+- `nsfw` - Optional - Bool - Whether the community is NSFW
 
 ### `GET /v1/communities?sort=<top|new>&count=<10>&offset=<0>`
 
@@ -72,6 +72,30 @@ Favourites the given community, returns an error if already favourited
 ### `DELETE /v1/communities/:community/favourite`
 
 Deletes a community favourite if it is favourited
+
+### `POST /v1/templates`
+
+Creates new template
+
+- `title` - Optional - Title of the template
+- `previewLink` - Image link of the template
+- `serialized` - JSON defining the serialized state of the canvas
+
+### `DELETE /v1/templates/:id`
+
+Deletes the given template if the user owns it and no meme is using it
+
+### `GET /v1/templates/:id`
+
+Retrieves details on the template, including the serialized data
+
+### `GET /v1/templates?sort=top|new&offset=0&count=10`
+
+Retrieves list of templates sorted by the parameters
+
+`top` templates are sorted by the amount of memes using that template
+
+Example: `/v1/templates?sort=top&count=10&offset=10`
 
 ### `GET /v1/search/:query/autocomplete`
 
