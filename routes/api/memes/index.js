@@ -84,6 +84,8 @@ router.get('/:memeid', async (req, res) => {
             model: models.Community,
             attributes: ['name']
         }],
+
+        // INCLUDE RETURN NET VOTING VALUE
     });
 
     if (meme) {
@@ -101,36 +103,64 @@ router.delete('/:memeid', auth.isAuthenticated, async (req, res) => {
 
     const meme = await models.Meme.findOne({
         where: {
-            id: memeId,
-            creatorId: req.session.userId
+            id: memeId
         }
     });
 
     if (!meme) {
-        return res.status(400).json({error: 'Failed to find this meme under current creator\'s name'});
+        return res.status(400).json({error: 'Failed to find this meme'});
     }
 
-    models.Meme.destroy({
-        where: {
-            id: memeId,
-            creatorId: req.session.userId
-        }
-    }).then(() => {
-        res.json({message: 'Successfully deleted the meme'});
-    }).catch((err) => {
-        res.status(500).json({error: 'Failed to delete the meme'});
-    })
+    if (meme.creatorId !== req.session.userId) {
+        res.status(401).json({error: 'You must be the creator of this meme to delete it'});
+        return;
+    }
+
+    await meme.destroy();
+
+    res.json({message: 'Successfully deleted the meme'});
 });
 
 /**
  * Vote for the meme
  */
 router.put('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
+    console.log("found one!");
 
+    const memeId = req.params.memeid;
+
+    const meme = await models.Meme.findOne({
+        where: {
+            id: memeId
+        }
+    });
+
+
+    if (!meme) {
+        return res.status(400).json({error: 'Failed to find this meme'});
+    }
+
+    // Check if user has already voted for this meme
+    const vote = await models.MemeVote.findOne({
+        where: {
+            MemeId: memeId,
+            UserId: req.session.userId
+        }
+    });
+
+    if (vote) {
+        if (vote.diff === req.body.vote) {
+            res.status(401).json({error: 'You have already voted for this meme'});
+            return;
+        }
+
+        await vote.save();
+    }
 });
 
+
 /**
- * Deletes meme
+ * Delete vote for the meme
  */
 router.delete('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
 
