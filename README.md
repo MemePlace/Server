@@ -73,6 +73,12 @@ Favourites the given community, returns an error if already favourited
 
 Deletes a community favourite if it is favourited
 
+### `GET /v1/communities/:community/templates?sort=top|new&offset=0&count=10`
+
+Retrieves list of templates that have been used in the given community sorted by the parameters
+
+`top` templates are sorted by the amount of memes using that template in the community
+
 ### `POST /v1/templates`
 
 Creates new template
