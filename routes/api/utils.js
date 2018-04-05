@@ -32,7 +32,8 @@ exports.getTemplates = async function(sort, count, offset, communityId) {
             'createdAt',
         ],
         limit: count,
-        offset
+        offset,
+        subQuery: false, // We want the limit to apply to the outer query
     };
 
     if (sort === 'new') {
@@ -53,8 +54,7 @@ exports.getTemplates = async function(sort, count, offset, communityId) {
                 attributes: ['username'],
             }],
             group: ['Template.id'],
-            order: [[models.sequelize.fn('COUNT', models.sequelize.col('Memes.id')), 'DESC']],
-            subQuery: false, // We want the limit to apply to the outer query
+            order: [[models.sequelize.fn('COUNT', models.sequelize.col('Memes.id')), 'DESC']]
         });
     }
     else {
