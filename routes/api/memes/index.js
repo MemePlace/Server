@@ -82,13 +82,29 @@ router.get('/:memeid', async (req, res) => {
         }, {
             model: models.Community,
             attributes: ['name']
-        }],
-
-        // INCLUDE RETURN NET VOTING VALUE
+        }]
     });
 
     if (meme) {
-        res.json(meme);
+        const totalVote = await models.MemeVote.sum('diff', {
+            where: {
+                MemeId: memeId
+            }
+        });
+
+        const myVote = await models.MemeVote.findOne({
+            where: {
+                MemeId: memeId,
+                UserId: req.session.userId
+            },
+            attributes: ['diff']
+        });
+
+        const m = meme.toJSON();
+        m.totalVote = totalVote;
+        m.myVote = myVote;
+
+        res.json(m);
     } else {
         res.status(400).json({error: 'Failed to find meme'});
     }
@@ -127,8 +143,6 @@ router.put('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
     const memeId = req.params.memeid;
     const userVote = parseInt(req.body.vote);
 
-    console.log(userVote);
-
     const meme = await models.Meme.findOne({
         where: {
             id: memeId
@@ -152,7 +166,13 @@ router.put('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
             return;
         }
 
-        await vote.save();
+        vote.diff = userVote;
+
+        await vote.save().catch((err) => {
+            console.error(err);
+            const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to create meme';
+            res.status(400).json({error: msg});
+        });
 
         res.json({message: 'Updated vote status for this meme'});
     }
@@ -201,6 +221,7 @@ router.delete('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
 
     await vote.destroy();
 
+    res.json({message: 'Vote deleted'})
 });
 
 module.exports = router;
