@@ -31,6 +31,11 @@ exports.getTemplates = async function(sort, count, offset, communityId) {
             'previewLink',
             'createdAt',
         ],
+        include: [{
+            model: models.User,
+            as: 'creator',
+            attributes: ['username'],
+        }],
         limit: count,
         offset,
         subQuery: false, // We want the limit to apply to the outer query
@@ -38,21 +43,11 @@ exports.getTemplates = async function(sort, count, offset, communityId) {
 
     if (sort === 'new') {
         options = Object.assign(options, {
-            include: [{
-                model: models.User,
-                as: 'creator',
-                attributes: ['username']
-            }],
             order: [['createdAt', 'DESC']]
         });
     }
     else if (sort === 'top') {
         options = Object.assign(options, {
-            include: [{
-                model: models.User,
-                as: 'creator',
-                attributes: ['username'],
-            }],
             group: ['Template.id'],
             order: [[models.sequelize.fn('COUNT', models.sequelize.col('Memes.id')), 'DESC']]
         });
