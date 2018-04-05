@@ -26,6 +26,11 @@ exports.getPrivateUserDetails = async function(username) {
 
 exports.getTemplates = async function(sort, count, offset, communityId) {
     let options = {
+        attributes: [
+            'title',
+            'previewLink',
+            'createdAt',
+        ],
         limit: count,
         offset
     };
@@ -40,43 +45,27 @@ exports.getTemplates = async function(sort, count, offset, communityId) {
 
     if (sort === 'new') {
         options = Object.assign(options, {
-            attributes: {
-                exclude: [
-                    'updatedAt',
-                    'creatorId',
-                    'serialized'
-                ]
-            },
-            order: [['createdAt', 'DESC']],
             include: [{
                 model: models.User,
                 as: 'creator',
                 attributes: ['username']
             }],
+            order: [['createdAt', 'DESC']]
         });
     }
     else if (sort === 'top') {
         options = Object.assign(options, {
-            attributes: {
-                include: [
-                    [models.sequelize.fn('COUNT', models.sequelize.col('Memes.id')), 'memeCount'],
-                ],
-                exclude: [
-                    'updatedAt',
-                    'creatorId',
-                    'serialized'
-                ]
-            },
             include: [{
                 model: models.User,
                 as: 'creator',
-                attributes: ['username']
+                attributes: ['username'],
             }, {
                 attributes: [],
                 model: models.Meme,
             }],
             group: ['Template.id'],
-            order: models.sequelize.literal('memeCount DESC'),
+            order: [[models.sequelize.fn('COUNT', models.sequelize.col('Memes.id')), 'DESC']],
+            subQuery: false, // We want the limit to apply to the outer query
         });
     }
     else {
@@ -86,7 +75,7 @@ exports.getTemplates = async function(sort, count, offset, communityId) {
     const result = await models.Template.findAndCountAll(options);
 
     return {
-        totalCount: result.count,
+        totalCount: result.count.length,
         templates: result.rows
     };
 };
