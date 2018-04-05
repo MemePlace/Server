@@ -1,7 +1,9 @@
 const express = require('express');
 const models = require('../models');
 const auth = require('../auth');
+const utils = require('../utils');
 const router = express.Router();
+
 
 /**
  * Creates a template
@@ -63,55 +65,13 @@ router.get('/', async (req, res) => {
     const count = (0 < parseInt(req.query.count) && parseInt(req.query.count) < 100) ? parseInt(req.query.count) : 10;
     const offset = parseInt(req.query.offset) || 0;
 
-    const totalCount = await models.Template.count();
-
-    let templates;
-
-    if (sort === 'new') {
-        templates = await models.Template.findAll({
-            limit: count,
-            offset,
-            order: [['createdAt', 'DESC']],
-            include: [{
-                model: models.User,
-                as: 'creator',
-                attributes: ['username']
-            }],
-        });
-    }
-    else if (sort === 'top') {
-        templates = await models.Template.findAll({
-            attributes: {
-                include: [
-                    [models.sequelize.fn('COUNT', models.sequelize.col('Memes.id')), 'memeCount'],
-                ],
-                exclude: [
-                    'updatedAt',
-                    'creatorId',
-                    'serialized'
-                ]
-            },
-            include: [{
-                model: models.User,
-                as: 'creator',
-                attributes: ['username']
-            }, {
-                attributes: [],
-                model: models.Meme,
-                required: false,
-            }],
-            limit: count,
-            offset,
-            group: ['Template.id'],
-            order: models.sequelize.literal('memeCount DESC'),
-        });
-    }
+    const result = await utils.getTemplates(sort, count, offset);
 
     res.json({
-        templates,
-        totalCount,
+        templates: result.templates,
+        totalCount: result.totalCount,
         offset,
-        size: templates.length,
+        size: result.templates.length,
         sort
     });
 });
