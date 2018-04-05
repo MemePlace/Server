@@ -125,7 +125,7 @@ router.delete('/:memeid', auth.isAuthenticated, async (req, res) => {
  */
 router.put('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
     const memeId = req.params.memeid;
-    const userVote = Boolean(req.body.vote);
+    const userVote = parseInt(req.body.vote);
 
     console.log(userVote);
 
@@ -152,22 +152,22 @@ router.put('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
             return;
         }
 
-        await vote.save().then(() => {
-            res.json({message: 'Updated vote status for this meme'});
-            return;
+        await vote.save();
+
+        res.json({message: 'Updated vote status for this meme'});
+    }
+    else {
+        models.MemeVote.create({
+            diff: userVote,
+            MemeId: memeId,
+            UserId: req.session.userId
+        }).then((newVote) => {
+            res.json(newVote);
+        }).catch((err) => {
+            const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to vote for this meme';
+            res.status(400).json({error: msg});
         });
     }
-
-    models.MemeVote.create({
-        diff: userVote,
-        MemeId: memeId,
-        UserId: req.session.userId
-    }).then((newVote) => {
-        res.json(newVote);
-    }).catch((err) => {
-        const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to vote for this meme';
-        res.status(400).json({error: msg});
-    });
 });
 
 

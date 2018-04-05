@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.TINYINT,
             validate: {
                 isIn: {
-                    args: [-1, 1],
+                    args: [[-1, 1]],
                     msg: 'Your vote must be either -1 or 1'
                 }
             }
