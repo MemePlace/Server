@@ -35,14 +35,6 @@ exports.getTemplates = async function(sort, count, offset, communityId) {
         offset
     };
 
-    if (communityId) {
-        options = Object.assign(options, {
-            where: {
-                CommunityId: communityId
-            },
-        });
-    }
-
     if (sort === 'new') {
         options = Object.assign(options, {
             include: [{
@@ -59,9 +51,6 @@ exports.getTemplates = async function(sort, count, offset, communityId) {
                 model: models.User,
                 as: 'creator',
                 attributes: ['username'],
-            }, {
-                attributes: [],
-                model: models.Meme,
             }],
             group: ['Template.id'],
             order: [[models.sequelize.fn('COUNT', models.sequelize.col('Memes.id')), 'DESC']],
@@ -71,6 +60,21 @@ exports.getTemplates = async function(sort, count, offset, communityId) {
     else {
         throw new Error("Improper sort parameter given");
     }
+
+    const memeInclude = {
+        attributes: [],
+        model: models.Meme,
+    };
+
+    // For communities, require that there are memes and that the meme communities are explicit
+    if (communityId) {
+        memeInclude.required = true;
+        memeInclude.where = {
+            CommunityId: communityId
+        };
+    }
+
+    options.include.push(memeInclude);
 
     const result = await models.Template.findAndCountAll(options);
 
