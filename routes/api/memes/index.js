@@ -13,10 +13,9 @@ router.post('/', auth.isAuthenticated, (req, res) => {
         link: req.body.link,
         creatorId: req.session.userId,
         TemplateId: parseInt(req.body.templateId) || null,
-        // if user must post to community, then before they've joined any community, what do they post to?
         CommunityId: parseInt(req.body.communityId) || null,
    }).then((meme) => {
-       res.json(meme);                      // unsure about this... what happens if the meme is created?
+       res.json(meme);
    }).catch((err) => {
        console.error(err);
        const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to create meme';
