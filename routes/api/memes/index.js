@@ -35,7 +35,19 @@ router.post('/', auth.isAuthenticated, (req, res) => {
  * Gets lists of memes
  */
 router.get('/', async (req, res) => {
+    const sort = (['top', 'new'].includes(req.query.sort) && req.query.sort) || 'top';
+    const count = (0 < parseInt(req.query.count) && parseInt(req.query.count) < 100) ? parseInt(req.query.count) : 10;
+    const offset = parseInt(req.query.offset) || 0;
 
+    const result = await utils.getMemes(sort, count, offset);
+
+    res.json({
+        memes: result.memes,
+        totalCount: result.totalCount,
+        offset,
+        size: result.memes.length,
+        sort
+    })
 });
 
 /**
