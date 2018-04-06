@@ -154,4 +154,11 @@ router.get('/:name/templates', (req, res) => {
     // TODO
 });
 
+/**
+ * Checks if community url is taken
+ */
+router.get('/:name/exists', (req, res) => {
+    
+});
+
 module.exports = router;
