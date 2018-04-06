@@ -164,9 +164,7 @@ router.get('/:name/exists', async (req, res) => {
         where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('name')), name.toLowerCase())
     });
 
-    if (!exists) {
-        return res.json({exists: !!exists});
-    }
+    res.json({exists: !!exists});
 });
 
 module.exports = router;
