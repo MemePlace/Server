@@ -173,4 +173,17 @@ router.get('/:name/templates', async (req, res) => {
     });
 });
 
+/**
+ * Checks if community url is taken
+ */
+router.get('/:name/exists', async (req, res) => {
+    const name = req.params.name;
+
+    const exists = await models.Community.findOne({
+        where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('name')), name.toLowerCase())
+    });
+
+    res.json({exists: !!exists});
+});
+
 module.exports = router;
