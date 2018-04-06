@@ -2,18 +2,26 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const models = require('../models');
 const auth = require('../auth');
+const utils = require('../utils');
 const router = express.Router();
 
 /**
  * Creates meme
  */
 router.post('/', auth.isAuthenticated, (req, res) => {
+   const communityId = parseInt(req.body.communityId) || null;
+
+   if (communityId === null) {
+       res.status(400).json({error: 'Community cannot be null'});
+       return;
+   }
+
    models.Meme.create({
         title: req.body.title,
         link: req.body.link,
         creatorId: req.session.userId,
         TemplateId: parseInt(req.body.templateId) || null,
-        CommunityId: parseInt(req.body.communityId) || null,
+        CommunityId: communityId,
    }).then((meme) => {
        res.json(meme);
    }).catch((err) => {
@@ -27,77 +35,7 @@ router.post('/', auth.isAuthenticated, (req, res) => {
  * Gets lists of memes
  */
 router.get('/', async (req, res) => {
-    // const sort = (['top', 'host', 'new'].includes(req.query.sort) && req.query.sort) || 'top';
-    // const count = (0 < parseInt(req.query.count) && parseInt(req.query.count) < 100) ? parseInt(req.query.count) : 10;
-    // // what is offset?
-    // const offset = parseInt(req.query.offset) || 0;
-    //
-    // // never defined an order??
-    // let order;
-    //
-    // if (sort === 'top') {
-    //     //order = ['voteCount', 'DESC']
-    // }
-    // else if (sort === 'new') {
-    //     // how are we storing creation time?
-    //     //order = ['createdAt', 'DESC'];
-    // }
-    // else if (sort === 'host'){
-    //     // get memes created by this user only
-    //     // not sure how to specify order...
-    // }    // const sort = (['top', 'host', 'new'].includes(req.query.sort) && req.query.sort) || 'top';
-    // const count = (0 < parseInt(req.query.count) && parseInt(req.query.count) < 100) ? parseInt(req.query.count) : 10;
-    // // what is offset?
-    // const offset = parseInt(req.query.offset) || 0;
-    //
-    // // never defined an order??
-    // let order;
-    //
-    // if (sort === 'top') {
-    //     //order = ['voteCount', 'DESC']
-    // }
-    // else if (sort === 'new') {
-    //     // how are we storing creation time?
-    //     //order = ['createdAt', 'DESC'];
-    // }
-    // else if (sort === 'host'){
-    //     // get memes created by this user only
-    //     // not sure how to specify order...
-    // }
-    //
-    // // why do we need this total count?
-    // const totalCount = await models.Meme.count();
-    //
-    // const memes = await models.Meme.findAll({
-    //     limit: count,
-    //     offset,
-    //     order: [order]
-    // });
-    //
-    // res.json({
-    //     memes,
-    //     totalCount,
-    //     offset,
-    //     size: memes.length,
-    //     sort
-    // });
-    //
-    // // why do we need this total count?
-    // const totalCount = await models.Meme.count();
-    //
-    // const memes = await models.Meme.findAll({
-    //     limit: count,
-    //     offset,
-    //     order: [order]
-    // });
-    //
-    // res.json({
-    //     memes,
-    //     totalCount,
-    //     offset,
-    //     size: memes.length,
-    //     sort
-    // });
+
 });
 
 /**
