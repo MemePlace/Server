@@ -45,7 +45,42 @@ router.get('/', async (req, res) => {
     // else if (sort === 'host'){
     //     // get memes created by this user only
     //     // not sure how to specify order...
+    // }    // const sort = (['top', 'host', 'new'].includes(req.query.sort) && req.query.sort) || 'top';
+    // const count = (0 < parseInt(req.query.count) && parseInt(req.query.count) < 100) ? parseInt(req.query.count) : 10;
+    // // what is offset?
+    // const offset = parseInt(req.query.offset) || 0;
+    //
+    // // never defined an order??
+    // let order;
+    //
+    // if (sort === 'top') {
+    //     //order = ['voteCount', 'DESC']
     // }
+    // else if (sort === 'new') {
+    //     // how are we storing creation time?
+    //     //order = ['createdAt', 'DESC'];
+    // }
+    // else if (sort === 'host'){
+    //     // get memes created by this user only
+    //     // not sure how to specify order...
+    // }
+    //
+    // // why do we need this total count?
+    // const totalCount = await models.Meme.count();
+    //
+    // const memes = await models.Meme.findAll({
+    //     limit: count,
+    //     offset,
+    //     order: [order]
+    // });
+    //
+    // res.json({
+    //     memes,
+    //     totalCount,
+    //     offset,
+    //     size: memes.length,
+    //     sort
+    // });
     //
     // // why do we need this total count?
     // const totalCount = await models.Meme.count();
@@ -207,7 +242,6 @@ router.delete('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
         return res.status(400).json({error: 'Failed to find this meme'});
     }
 
-    // Check if user has already voted for this meme
     const vote = await models.MemeVote.findOne({
         where: {
             MemeId: memeId,
