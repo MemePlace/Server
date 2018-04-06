@@ -157,8 +157,20 @@ router.get('/:name/templates', (req, res) => {
 /**
  * Checks if community url is taken
  */
-router.get('/:name/exists', (req, res) => {
+router.get('/:name/exists', async (req, res) => {
+    const reqName = req.params.name;
 
+    console.log(reqName);
+
+    const exist = await models.Community.findOne({
+        where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('name')), reqName.toLowerCase())
+    });
+
+    if (!exist) {
+        return res.json({exists: false});
+    }
+
+    return res.json({exists: true});
 });
 
 module.exports = router;
