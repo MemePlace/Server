@@ -23,7 +23,6 @@ exports.getPrivateUserDetails = async function(username) {
     return user;
 };
 
-
 exports.getTemplates = async function(sort, count, offset, communityId) {
     let options = {
         attributes: [
@@ -77,4 +76,8 @@ exports.getTemplates = async function(sort, count, offset, communityId) {
         totalCount: result.count.length,
         templates: result.rows
     };
+};
+
+exports.getMemes = async function(sort, count, offset) {
+
 };
