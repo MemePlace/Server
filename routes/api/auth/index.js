@@ -38,12 +38,21 @@ router.post('/', async (req, res) => {
     if (!valid) {
         return res.status(400).json({error: 'Invalid password'});
     }
+    
+    const rememberMe = req.body.rememberMe;
+    
+    if(rememberMe){
+        // Sets cookie length to 1 year
+        req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
+        req.session.rolling = true;
+        req.session.resave = true;
+    }
 
     // Valid credentials, log them in
     req.session.userId = user.id;
     req.session.username = user.username;
     req.session.email = user.email;
-
+    
     const userDetails = await utils.getPrivateUserDetails(user.username);
 
     if (userDetails) {
