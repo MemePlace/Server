@@ -41,11 +41,9 @@ router.post('/', async (req, res) => {
     
     const rememberMe = req.body.rememberMe;
     
-    if(rememberMe){
+    if(rememberMe === true){
         // Sets cookie length to 1 year
-        req.session.cookie.maxAge = 365 * 24 * 60 * 60 * 1000;
-        req.session.rolling = true;
-        req.session.resave = true;
+        req.session.cookie.maxAge = 2 * 365 * 24 * 60 * 60 * 1000;
     }
 
     // Valid credentials, log them in
