@@ -159,7 +159,7 @@ router.put('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
             res.status(400).json({error: msg});
         });
 
-        res.json({message: 'Updated vote status for this meme'});
+        res.json(vote);
     }
     else {
         models.MemeVote.create({
