@@ -42,7 +42,7 @@ router.post('/', async (req, res) => {
     const rememberMe = req.body.rememberMe;
     
     if(rememberMe === true){
-        // Sets cookie length to 1 year
+        // Sets cookie length to 2 years
         req.session.cookie.maxAge = 2 * 365 * 24 * 60 * 60 * 1000;
     }
 
