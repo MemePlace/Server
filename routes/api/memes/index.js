@@ -175,7 +175,6 @@ router.put('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
     }
 });
 
-
 /**
  * Delete vote for the meme
  */
@@ -208,4 +207,28 @@ router.delete('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
     res.json({message: 'Vote deleted'})
 });
 
+/**
+ * Return net meme vote
+ */
+router.get('/:memeid/vote', async (req, res) => {
+    const memeId = req.params.memeid;
+
+    const meme = await models.Meme.findOne({
+        where: {
+            id: memeId
+        }
+    });
+
+    if (!meme) {
+        return res.status(400).json({error: 'Failed to find this meme'});
+    }
+
+    const totalVote = await models.MemeVote.sum('diff', {
+        where: {
+            MemeId: memeId
+        }
+    });
+
+    res.json(totalVote);
+})
 module.exports = router;

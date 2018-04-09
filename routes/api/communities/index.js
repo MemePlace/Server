@@ -168,7 +168,7 @@ router.get('/:name/templates', async (req, res) => {
         templates: result.templates,
         totalCount: result.totalCount,
         offset,
-        size: result.templates.length,
+          size: result.templates.length,
         sort
     });
 });
