@@ -79,6 +79,37 @@ Retrieves list of templates that have been used in the given community sorted by
 
 `top` templates are sorted by the amount of memes using that template in the community
 
+### `POST /v1/memes`
+
+Creates new meme
+
+- `title` - Optional - Title of the meme
+- `link` - Image link of the meme
+- `templateId` - Template ID of the meme
+- `communityId` - Community ID of the meme
+
+### `GET /v1/memes?sort=top|new&offset=0&count=10`
+
+WIP - Gets list of memes across all communities
+
+### `GET /v1/memes/:id`
+
+Retrieves details on the given meme
+
+### `DELETE /v1/memes/:id`
+
+Deletes the meme if they are the creator
+
+### `PUT /v1/memes/:id/vote`
+
+Votes for a meme
+
+- `vote` - The vote for the meme, either 1 or -1
+
+### `DELETE /v1/memes/:id/vote`
+
+Deletes a vote for a meme
+
 ### `POST /v1/templates`
 
 Creates new template
