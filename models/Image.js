@@ -17,10 +17,6 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false,
             validate: {
-                notNull: {
-                    args: true,
-                    msg: 'You must include an image width'
-                },
                 min: {
                     args: 100,
                     msg: 'Your image width must be greater than 100 pixels'
@@ -35,10 +31,6 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false,
             validate: {
-                notNull: {
-                    args: true,
-                    msg: 'You must include an image height'
-                },
                 min: {
                     args: 100,
                     msg: 'Your image height must be greater than 100 pixels'
@@ -52,7 +44,14 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         indexes: [
             // Indexes
-        ]
+        ],
+        defaultScope: {
+            attributes: [
+                'link',
+                'width',
+                'height'
+            ]
+        }
     });
 
     Image.associate = function(models) {
