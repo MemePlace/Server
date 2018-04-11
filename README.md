@@ -85,6 +85,8 @@ Creates new meme
 
 - `title` - Optional - Title of the meme
 - `link` - Image link of the meme
+- `width` - Width of the meme (100 <= width <= 6000)
+- `height` - Height of the meme (100 <= height <= 6000)
 - `templateId` - Template ID of the meme
 - `communityId` - Community ID of the meme
 
