@@ -4,7 +4,12 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         indexes: [
             // Link
-        ]
+        ],
+        defaultScope: {
+            attributes: {
+                exclude: ['updatedAt', 'CommunityId', 'creatorId']
+            }
+        }
     });
 
     Meme.associate = function(models) {
