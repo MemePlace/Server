@@ -18,10 +18,16 @@ router.post('/', auth.isAuthenticated, (req, res) => {
 
    models.Meme.create({
         title: req.body.title,
-        link: req.body.link,
         creatorId: req.session.userId,
+        Image: {
+            link: req.body.link,
+            width: req.body.width,
+            height: req.body.height
+        },
         TemplateId: parseInt(req.body.templateId) || null,
         CommunityId: communityId,
+   }, {
+       include: [models.Image]
    }).then((meme) => {
        res.json(meme);
    }).catch((err) => {
@@ -67,6 +73,8 @@ router.get('/:memeid', async (req, res) => {
         }, {
             model: models.Community,
             attributes: ['name']
+        }, {
+            model: models.Image
         }]
     });
 
