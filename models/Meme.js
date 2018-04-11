@@ -26,7 +26,8 @@ module.exports = (sequelize, DataTypes) => {
                     });
                 }
             }
-        }
+        },
+        netVote: DataTypes.INTEGER
     }, {
         indexes: [
             {
