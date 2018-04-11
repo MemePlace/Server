@@ -8,13 +8,17 @@ const router = express.Router();
 /**
  * Creates meme
  */
-router.post('/', auth.isAuthenticated, (req, res) => {
-   const communityId = parseInt(req.body.communityId) || null;
+router.post('/', auth.isAuthenticated, async (req, res) => {
+    const communityName = req.body.communityName;
 
-   if (communityId === null) {
-       res.status(400).json({error: 'Community cannot be null'});
-       return;
-   }
+    const community = await models.Community.findOne({
+        where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('name')), 
+            communityName.toLowerCase())
+    });
+
+    if (!community) {
+        return res.status(400).json({error: 'Failed to find the community'});
+    }
 
    models.Meme.create({
         title: req.body.title,
@@ -25,7 +29,7 @@ router.post('/', auth.isAuthenticated, (req, res) => {
             height: req.body.height
         },
         TemplateId: parseInt(req.body.templateId) || null,
-        CommunityId: communityId,
+        CommunityId: community.id,
    }, {
        include: [models.Image]
    }).then((meme) => {

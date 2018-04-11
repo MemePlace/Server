@@ -88,7 +88,7 @@ Creates new meme
 - `width` - Width of the meme (100 <= width <= 6000)
 - `height` - Height of the meme (100 <= height <= 6000)
 - `templateId` - Template ID of the meme
-- `communityId` - Community ID of the meme
+- `communityName` - Community name of the meme
 
 ### `GET /v1/memes?sort=top|new&offset=0&count=10`
 
