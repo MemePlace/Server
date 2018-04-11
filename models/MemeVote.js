@@ -15,6 +15,29 @@ module.exports = (sequelize, DataTypes) => {
         // associations
         models.MemeVote.belongsTo(models.Meme);
         models.MemeVote.belongsTo(models.User);
+
+
+        MemeVote.afterUpdate( (memeVote, options) => {
+            console.log("Inside MemeVote update");
+
+            const newNetVote = models.MemeVote.sum('diff', {
+                where: {
+                    MemeId: memeVote.MemeId
+                }
+            });
+
+            console.log("New net vote = " + newNetVote.toString());
+
+            models.Meme.update({
+                netVote: newNetVote
+            }, {
+                where: {
+                    id: memeVote.MemeId
+                }
+            });
+
+            console.log("new vote = " );
+        });
     };
 
     return MemeVote;

@@ -26,8 +26,11 @@ module.exports = (sequelize, DataTypes) => {
                     });
                 }
             }
-        }g,
-        netVote: DataTypes.INTEGER
+        },
+        netVote: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0
+        }
     }, {
         indexes: [
             {

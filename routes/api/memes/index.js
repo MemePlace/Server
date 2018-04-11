@@ -21,7 +21,7 @@ router.post('/', auth.isAuthenticated, (req, res) => {
         link: req.body.link,
         creatorId: req.session.userId,
         TemplateId: parseInt(req.body.templateId) || null,
-        CommunityId: communityId,
+        CommunityId: communityId
    }).then((meme) => {
        res.json(meme);
    }).catch((err) => {
@@ -151,15 +151,18 @@ router.put('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
             return;
         }
 
-        vote.diff = userVote;
+        //vote.diff = userVote;
 
-        await vote.save().catch((err) => {
+        await vote.update({
+            diff: userVote
+        }).then(() => {
+            res.json(vote);
+            //res.json("Successfully updated vote");
+        }).catch((err) => {
             console.error(err);
-            const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to create meme';
+            const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to update vote';
             res.status(400).json({error: msg});
         });
-
-        res.json(vote);
     }
     else {
         models.MemeVote.create({
@@ -169,7 +172,7 @@ router.put('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
         }).then((newVote) => {
             res.json(newVote);
         }).catch((err) => {
-            const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to vote for this meme';
+            const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to create a vote for this meme';
             res.status(400).json({error: msg});
         });
     }
