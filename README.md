@@ -116,6 +116,8 @@ Creates new template
 
 - `title` - Optional - Title of the template
 - `previewLink` - Image link of the template
+- `previewWidth` - Width of the preview image (100 <= width <= 6000)
+- `previewHeight` - Height of the preview image (100 <= height <= 6000)
 - `serialized` - JSON defining the serialized state of the canvas
 
 ### `DELETE /v1/templates/:id`
