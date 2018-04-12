@@ -71,12 +71,6 @@ router.get('/:memeid', async (req, res) => {
     });
 
     if (meme) {
-        const totalVote = await models.MemeVote.sum('diff', {
-            where: {
-                MemeId: memeId
-            }
-        });
-
         const myVote = await models.MemeVote.findOne({
             where: {
                 MemeId: memeId,
@@ -86,7 +80,6 @@ router.get('/:memeid', async (req, res) => {
         });
 
         const m = meme.toJSON();
-        m.totalVote = totalVote;
         m.myVote = myVote;
 
         res.json(m);

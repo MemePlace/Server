@@ -17,26 +17,64 @@ module.exports = (sequelize, DataTypes) => {
         models.MemeVote.belongsTo(models.User);
 
 
-        MemeVote.afterUpdate( (memeVote, options) => {
-            console.log("Inside MemeVote update");
+        MemeVote.beforeUpdate( (memeVote, options) => {
+            if (memeVote.diff === 1){
+                models.Meme.update({
+                    netVote: sequelize.literal('netVote + 1')
+                }, {
+                    where: {
+                        id: memeVote.MemeId
+                    }
+                })
+            }else {
+                models.Meme.update({
+                    netVote: sequelize.literal('netVote - 1')
+                }, {
+                    where: {
+                        id: memeVote.MemeId
+                    }
+                })
+            }
+        });
 
-            const newNetVote = models.MemeVote.sum('diff', {
-                where: {
-                    MemeId: memeVote.MemeId
-                }
-            });
+        MemeVote.afterCreate( (memeVote, options) => {
+            if (memeVote.diff === 1){
+                models.Meme.update({
+                    netVote: sequelize.literal('netVote + 1')
+                }, {
+                    where: {
+                        id: memeVote.MemeId
+                    }
+                })
+            }else {
+                models.Meme.update({
+                    netVote: sequelize.literal('netVote - 1')
+                }, {
+                    where: {
+                        id: memeVote.MemeId
+                    }
+                })
+            }
+        });
 
-            console.log("New net vote = " + newNetVote.toString());
-
-            models.Meme.update({
-                netVote: newNetVote
-            }, {
-                where: {
-                    id: memeVote.MemeId
-                }
-            });
-
-            console.log("new vote = " );
+        MemeVote.beforeDestroy( (memeVote, options) => {
+            if (memeVote.diff === 1){
+                models.Meme.update({
+                    netVote: sequelize.literal('netVote - 1')
+                }, {
+                    where: {
+                        id: memeVote.MemeId
+                    }
+                })
+            }else {
+                models.Meme.update({
+                    netVote: sequelize.literal('netVote + 1')
+                }, {
+                    where: {
+                        id: memeVote.MemeId
+                    }
+                })
+            }
         });
     };
 
