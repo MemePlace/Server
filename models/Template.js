@@ -9,14 +9,6 @@ module.exports = (sequelize, DataTypes) => {
                 }
             }
         },
-        previewLink: {
-            type: DataTypes.STRING,
-            validate: {
-                isUrl: {
-                    msg: 'Your URL doesn\'t have a proper structure'
-                }
-            }
-        },
         serialized: {
             type: DataTypes.JSON,
             allowNull: false,
@@ -32,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     Template.associate = function(models) {
         models.Template.belongsTo(models.User, {as: 'creator'});
         models.Template.hasMany(models.Meme);
+        models.Template.belongsTo(models.Image);
     };
 
     return Template;
