@@ -43,8 +43,6 @@ router.get('/', async (req, res) => {
 
     if (sort === 'top') {
         order = ['totalVote', 'DESC']
-
-        console.log("top");
     }
 
     const totalCount = await models.Meme.count();
