@@ -35,19 +35,22 @@ router.post('/', auth.isAuthenticated, (req, res) => {
  * Gets lists of memes
  */
 router.get('/', async (req, res) => {
-    const sort = (['top', 'new'].includes(req.query.sort) && req.query.sort) || 'top';
+    const sort = (['top', 'new'].includes(req.query.sort) && req.query.sort) || 'new';
     const count = (0 < parseInt(req.query.count) && parseInt(req.query.count) < 100) ? parseInt(req.query.count) : 10;
     const offset = parseInt(req.query.offset) || 0;
 
     let order = ['createdAt', 'DESC'];
 
-    if (sort === 'new') {
-        order: ['totalVote', 'DESC']
+    if (sort === 'top') {
+        order = ['totalVote', 'DESC']
+
+        console.log("top");
     }
 
     const totalCount = await models.Meme.count();
 
     const memes = await models.Meme.findAll({
+        attributes: ['id'],
         limit: count,
         offset,
         order: [order]

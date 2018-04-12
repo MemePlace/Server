@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
         MemeVote.beforeUpdate( (memeVote, options) => {
             if (memeVote.diff === 1){
                 models.Meme.update({
-                    totalVote: sequelize.literal('totalVote + 1')
+                    totalVote: sequelize.literal('totalVote + 2')
                 }, {
                     where: {
                         id: memeVote.MemeId
@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
                 })
             }else {
                 models.Meme.update({
-                    totalVote: sequelize.literal('totalVote - 1')
+                    totalVote: sequelize.literal('totalVote - 2')
                 }, {
                     where: {
                         id: memeVote.MemeId
