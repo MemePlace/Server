@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
                 }
             }
         },
-        netVote: {
+        totalVote: {
             type: DataTypes.INTEGER,
             defaultValue: 0
         }

@@ -77,7 +77,3 @@ exports.getTemplates = async function(sort, count, offset, communityId) {
         templates: result.rows
     };
 };
-
-exports.getMemes = async function(sort, count, offset) {
-
-};

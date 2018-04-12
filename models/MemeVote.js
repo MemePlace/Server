@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
         MemeVote.beforeUpdate( (memeVote, options) => {
             if (memeVote.diff === 1){
                 models.Meme.update({
-                    netVote: sequelize.literal('netVote + 1')
+                    totalVote: sequelize.literal('totalVote + 1')
                 }, {
                     where: {
                         id: memeVote.MemeId
@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
                 })
             }else {
                 models.Meme.update({
-                    netVote: sequelize.literal('netVote - 1')
+                    totalVote: sequelize.literal('totalVote - 1')
                 }, {
                     where: {
                         id: memeVote.MemeId
@@ -40,7 +40,7 @@ module.exports = (sequelize, DataTypes) => {
         MemeVote.afterCreate( (memeVote, options) => {
             if (memeVote.diff === 1){
                 models.Meme.update({
-                    netVote: sequelize.literal('netVote + 1')
+                    totalVote: sequelize.literal('totalVote + 1')
                 }, {
                     where: {
                         id: memeVote.MemeId
@@ -48,7 +48,7 @@ module.exports = (sequelize, DataTypes) => {
                 })
             }else {
                 models.Meme.update({
-                    netVote: sequelize.literal('netVote - 1')
+                    totalVote: sequelize.literal('totalVote - 1')
                 }, {
                     where: {
                         id: memeVote.MemeId
@@ -60,7 +60,7 @@ module.exports = (sequelize, DataTypes) => {
         MemeVote.beforeDestroy( (memeVote, options) => {
             if (memeVote.diff === 1){
                 models.Meme.update({
-                    netVote: sequelize.literal('netVote - 1')
+                    totalVote: sequelize.literal('totalVote - 1')
                 }, {
                     where: {
                         id: memeVote.MemeId
@@ -68,7 +68,7 @@ module.exports = (sequelize, DataTypes) => {
                 })
             }else {
                 models.Meme.update({
-                    netVote: sequelize.literal('netVote + 1')
+                    totalVote: sequelize.literal('totalVote + 1')
                 }, {
                     where: {
                         id: memeVote.MemeId

@@ -34,18 +34,59 @@ router.post('/', auth.isAuthenticated, (req, res) => {
 /**
  * Gets lists of memes
  */
+
+// const sort = (['top', 'new'].includes(req.query.sort) && req.query.sort) || 'top';
+// const count = (0 < parseInt(req.query.count) && parseInt(req.query.count) < 100) ? parseInt(req.query.count) : 10;
+// const offset = parseInt(req.query.offset) || 0;
+//
+// let order;
+//
+// if (sort === 'top') {
+//     order = ['favourites', 'DESC']
+// }
+// else if (sort === 'new') {
+//     order = ['createdAt', 'DESC'];
+// }
+//
+// const totalCount = await models.Community.count();
+//
+// const communities = await models.Community.findAll({
+//     limit: count,
+//     offset,
+//     order: [order]
+// });
+//
+// res.json({
+//     communities,
+//     totalCount,
+//     offset,
+//     size: communities.length,
+//     sort
+// });
+
 router.get('/', async (req, res) => {
     const sort = (['top', 'new'].includes(req.query.sort) && req.query.sort) || 'top';
     const count = (0 < parseInt(req.query.count) && parseInt(req.query.count) < 100) ? parseInt(req.query.count) : 10;
     const offset = parseInt(req.query.offset) || 0;
 
-    const result = await utils.getMemes(sort, count, offset);
+    let order = ['totalVote', 'DESC'];
+
+    if (sort === 'new') {
+        order: ['createdAt', 'DESC']
+    }
+
+    const totalCount = await models.Meme.count();
+
+    const memes = await models.Meme.findAll({
+        limit: count,
+        offset,
+        order: [order]
+    });
 
     res.json({
-        memes: result.memes,
-        totalCount: result.totalCount,
+        memes,
+        totalCount,
         offset,
-        size: result.memes.length,
         sort
     })
 });
