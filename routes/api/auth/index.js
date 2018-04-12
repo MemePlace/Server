@@ -11,7 +11,7 @@ router.isAuthenticated = function(req, res, next) {
     if (req.session && req.session.userId && req.session.username) {
         next();
     } else {
-        res.status(401).json({error: 'You must be authenticated to interact with this resource'});
+        res.status(401).json({error: 'You must be logged in to do that'});
     }
 };
 
