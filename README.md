@@ -79,12 +79,47 @@ Retrieves list of templates that have been used in the given community sorted by
 
 `top` templates are sorted by the amount of memes using that template in the community
 
+### `POST /v1/memes`
+
+Creates new meme
+
+- `title` - Optional - Title of the meme
+- `link` - Image link of the meme
+- `width` - Width of the meme (100 <= width <= 6000)
+- `height` - Height of the meme (100 <= height <= 6000)
+- `templateId` - Template ID of the meme
+- `communityName` - Community name of the meme
+
+### `GET /v1/memes?sort=top|new&offset=0&count=10`
+
+WIP - Gets list of memes across all communities
+
+### `GET /v1/memes/:id`
+
+Retrieves details on the given meme
+
+### `DELETE /v1/memes/:id`
+
+Deletes the meme if they are the creator
+
+### `PUT /v1/memes/:id/vote`
+
+Votes for a meme
+
+- `vote` - The vote for the meme, either 1 or -1
+
+### `DELETE /v1/memes/:id/vote`
+
+Deletes a vote for a meme
+
 ### `POST /v1/templates`
 
 Creates new template
 
 - `title` - Optional - Title of the template
 - `previewLink` - Image link of the template
+- `previewWidth` - Width of the preview image (100 <= width <= 6000)
+- `previewHeight` - Height of the preview image (100 <= height <= 6000)
 - `serialized` - JSON defining the serialized state of the canvas
 
 ### `DELETE /v1/templates/:id`

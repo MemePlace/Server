@@ -11,7 +11,7 @@ router.isAuthenticated = function(req, res, next) {
     if (req.session && req.session.userId && req.session.username) {
         next();
     } else {
-        res.status(401).json({error: 'You must be authenticated to interact with this resource'});
+        res.status(401).json({error: 'You must be logged in to do that'});
     }
 };
 
@@ -38,12 +38,19 @@ router.post('/', async (req, res) => {
     if (!valid) {
         return res.status(400).json({error: 'Invalid password'});
     }
+    
+    const rememberMe = req.body.rememberMe;
+    
+    if(rememberMe === true){
+        // Sets cookie length to 2 years
+        req.session.cookie.maxAge = 2 * 365 * 24 * 60 * 60 * 1000;
+    }
 
     // Valid credentials, log them in
     req.session.userId = user.id;
     req.session.username = user.username;
     req.session.email = user.email;
-
+    
     const userDetails = await utils.getPrivateUserDetails(user.username);
 
     if (userDetails) {
