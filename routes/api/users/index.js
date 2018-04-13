@@ -54,4 +54,17 @@ router.get('/:username', async (req, res) => {
     }
 });
 
+/**
+ * Check if email is taken
+ */
+router.get('/:email/exists', async (req, res) => {
+   const email = req.params.email;
+
+   const exists = await models.User.findOne({
+      where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('email')), email.toLowerCase())
+   });
+
+   res.json({exists: !!exists});
+});
+
 module.exports = router;
