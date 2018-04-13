@@ -85,8 +85,10 @@ Creates new meme
 
 - `title` - Optional - Title of the meme
 - `link` - Image link of the meme
+- `width` - Width of the meme (100 <= width <= 6000)
+- `height` - Height of the meme (100 <= height <= 6000)
 - `templateId` - Template ID of the meme
-- `communityId` - Community ID of the meme
+- `communityName` - Community name of the meme
 
 ### `GET /v1/memes?sort=top|new&offset=0&count=10`
 
@@ -116,6 +118,8 @@ Creates new template
 
 - `title` - Optional - Title of the template
 - `previewLink` - Image link of the template
+- `previewWidth` - Width of the preview image (100 <= width <= 6000)
+- `previewHeight` - Height of the preview image (100 <= height <= 6000)
 - `serialized` - JSON defining the serialized state of the canvas
 
 ### `DELETE /v1/templates/:id`
