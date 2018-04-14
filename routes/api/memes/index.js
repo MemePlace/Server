@@ -20,25 +20,36 @@ router.post('/', auth.isAuthenticated, async (req, res) => {
         return res.status(400).json({error: 'Failed to find the community'});
     }
 
-    models.Meme.create({
-        title: req.body.title,
-        creatorId: req.session.userId,
-        Image: {
-            link: req.body.link,
-            width: req.body.width,
-            height: req.body.height
-        },
-        TemplateId: parseInt(req.body.templateId) || null,
-        CommunityId: community.id,
-    }, {
-        include: [models.Image]
-    }).then((meme) => {
+    try {
+        const meme = await models.Meme.create({
+            title: req.body.title,
+            creatorId: req.session.userId,
+            Image: {
+                link: req.body.link,
+                width: req.body.width,
+                height: req.body.height
+            },
+            TemplateId: parseInt(req.body.templateId) || null,
+            CommunityId: community.id,
+        });
+
+
+        // The user votes for this meme automatically
+        await models.MemeVote.create({
+            diff: 1,
+            MemeId: meme.id,
+            UserId: req.session.userId
+        });
+
+        // fetch new details for the meme
+        await meme.reload();
+
         res.json(meme);
-    }).catch((err) => {
+    } catch(e) {
         console.error(err);
         const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to create meme';
         res.status(400).json({error: msg});
-    });
+    }
 });
 
 /**
