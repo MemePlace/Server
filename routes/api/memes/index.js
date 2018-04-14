@@ -29,13 +29,9 @@ router.post('/', auth.isAuthenticated, async (req, res) => {
             height: req.body.height
         },
         TemplateId: parseInt(req.body.templateId) || null,
-<<<<<<< HEAD
         CommunityId: community.id,
    }, {
        include: [models.Image]
-=======
-        CommunityId: communityId
->>>>>>> 1fdadc50d365d36c4c8559af416f28443370d3ae
    }).then((meme) => {
        res.json(meme);
    }).catch((err) => {
