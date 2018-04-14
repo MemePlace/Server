@@ -31,6 +31,8 @@ router.post('/', auth.isAuthenticated, async (req, res) => {
             },
             TemplateId: parseInt(req.body.templateId) || null,
             CommunityId: community.id,
+        }, {
+            include: [models.Image]
         });
 
 
