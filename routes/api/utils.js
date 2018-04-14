@@ -117,7 +117,7 @@ exports.getMemes = async function(sort, count, offset, communityId) {
     const result = await models.Meme.findAndCountAll(options);
 
     return {
-        totalCount: result.count.length,
+        totalCount: result.count,
         memes: result.rows,
     };
 };
