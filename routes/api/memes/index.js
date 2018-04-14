@@ -9,7 +9,7 @@ const router = express.Router();
  * Creates meme
  */
 router.post('/', auth.isAuthenticated, async (req, res) => {
-    const communityName = req.body.communityName;
+    const communityName = req.body.communityName || '';
 
     const community = await models.Community.findOne({
         where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('name')), 
