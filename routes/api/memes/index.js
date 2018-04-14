@@ -229,9 +229,29 @@ router.delete('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
 });
 
 /**
+ * Gets list of comments for a meme
+ */
+router.get('/:memeid/comments', async (req, res) => {
+
+    let order = ['createdAt', 'ASC'];
+
+    const comments = await models.Comment.findAll({
+        where: {
+            memeId: req.params.memeid
+        },
+        attributes: ['id', 'text'],
+        order: [order]
+    });
+
+    res.json({
+        comments
+    });
+});
+
+/**
  * Add a comment to a meme
  */
-router.put('/:memeid/comment', auth.isAuthenticated, async (req, res) => {
+router.post('/:memeid/comments', auth.isAuthenticated, async (req, res) => {
     const memeId = req.params.memeid;
 
     const meme = await models.Meme.findOne({
@@ -261,7 +281,7 @@ router.put('/:memeid/comment', auth.isAuthenticated, async (req, res) => {
 /**
  * Delete a comment from a meme
  */
-router.delete('/:memeid/comment', auth.isAuthenticated, async (req, res) => {
+router.delete('/:memeid/comments/:commentid', auth.isAuthenticated, async (req, res) => {
     const memeId = req.params.memeid;
 
     const meme = await models.Meme.findOne({
@@ -278,7 +298,7 @@ router.delete('/:memeid/comment', auth.isAuthenticated, async (req, res) => {
         where: {
             MemeId: memeId,
             UserId: req.session.userId,
-            id: req.body.id,
+            id: req.params.commentid,
         }
     });
 
