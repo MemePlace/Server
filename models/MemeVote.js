@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
             if (!meme) {
                 return;
             }
-            
+
             const newTotalScore = meme.totalVote + difference;
             const newHotScore = utils.hotScore(newTotalScore, meme.createdAt);
 
@@ -35,10 +35,7 @@ module.exports = (sequelize, DataTypes) => {
         models.MemeVote.belongsTo(models.User);
 
         MemeVote.beforeUpdate(async (memeVote) => updateScore((memeVote.diff === 1) ? 2 : -2, memeVote.MemeId));
-
-
         MemeVote.afterCreate(async (memeVote) => updateScore((memeVote.diff === 1) ? 1 : -1, memeVote.MemeId));
-
         MemeVote.beforeDestroy(async (memeVote) => updateScore((memeVote.diff === 1) ? -1 : 1, memeVote.MemeId));
     };
 
