@@ -9,7 +9,7 @@ const router = express.Router();
  * Creates meme
  */
 router.post('/', auth.isAuthenticated, async (req, res) => {
-    const communityName = req.body.communityName;
+    const communityName = req.body.communityName || '';
 
     const community = await models.Community.findOne({
         where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('name')), 
@@ -45,17 +45,29 @@ router.post('/', auth.isAuthenticated, async (req, res) => {
  * Gets lists of memes
  */
 router.get('/', async (req, res) => {
-    const sort = (['top', 'new'].includes(req.query.sort) && req.query.sort) || 'top';
+    const sort = (['top', 'new'].includes(req.query.sort) && req.query.sort) || 'new';
     const count = (0 < parseInt(req.query.count) && parseInt(req.query.count) < 100) ? parseInt(req.query.count) : 10;
     const offset = parseInt(req.query.offset) || 0;
 
-    const result = await utils.getMemes(sort, count, offset);
+    let order = ['createdAt', 'DESC'];
+
+    if (sort === 'top') {
+        order = ['totalVote', 'DESC']
+    }
+
+    const totalCount = await models.Meme.count();
+
+    const memes = await models.Meme.findAll({
+        attributes: ['id'],
+        limit: count,
+        offset,
+        order: [order]
+    });
 
     res.json({
-        memes: result.memes,
-        totalCount: result.totalCount,
+        memes,
+        totalCount,
         offset,
-        size: result.memes.length,
         sort
     })
 });
@@ -83,12 +95,6 @@ router.get('/:memeid', async (req, res) => {
     });
 
     if (meme) {
-        const totalVote = await models.MemeVote.sum('diff', {
-            where: {
-                MemeId: memeId
-            }
-        });
-
         const myVote = await models.MemeVote.findOne({
             where: {
                 MemeId: memeId,
@@ -98,7 +104,6 @@ router.get('/:memeid', async (req, res) => {
         });
 
         const m = meme.toJSON();
-        m.totalVote = totalVote;
         m.myVote = myVote;
 
         res.json(m);
@@ -159,19 +164,22 @@ router.put('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
 
     if (vote) {
         if (vote.diff === userVote) {
-            res.status(401).json({error: 'You have already voted for this meme'});
+            res.status(400).json({error: 'You have already voted for this meme'});
             return;
         }
 
-        vote.diff = userVote;
+        //vote.diff = userVote;
 
-        await vote.save().catch((err) => {
+        await vote.update({
+            diff: userVote
+        }).then(() => {
+            res.json(vote);
+            //res.json("Successfully updated vote");
+        }).catch((err) => {
             console.error(err);
-            const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to create meme';
+            const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to update vote';
             res.status(400).json({error: msg});
         });
-
-        res.json({message: 'Updated vote status for this meme'});
     }
     else {
         models.MemeVote.create({
@@ -181,7 +189,7 @@ router.put('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
         }).then((newVote) => {
             res.json(newVote);
         }).catch((err) => {
-            const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to vote for this meme';
+            const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to create a vote for this meme';
             res.status(400).json({error: msg});
         });
     }
