@@ -34,9 +34,9 @@ module.exports = (sequelize, DataTypes) => {
         models.MemeVote.belongsTo(models.Meme);
         models.MemeVote.belongsTo(models.User);
 
-        MemeVote.beforeUpdate(async (memeVote) => updateScore((memeVote.diff === 1) ? 2 : -2, memeVote.MemeId));
-        MemeVote.afterCreate(async (memeVote) => updateScore((memeVote.diff === 1) ? 1 : -1, memeVote.MemeId));
-        MemeVote.beforeDestroy(async (memeVote) => updateScore((memeVote.diff === 1) ? -1 : 1, memeVote.MemeId));
+        MemeVote.beforeUpdate((memeVote) => updateScore((memeVote.diff === 1) ? 2 : -2, memeVote.MemeId));
+        MemeVote.afterCreate((memeVote) => updateScore((memeVote.diff === 1) ? 1 : -1, memeVote.MemeId));
+        MemeVote.beforeDestroy((memeVote) => updateScore((memeVote.diff === 1) ? -1 : 1, memeVote.MemeId));
     };
 
     return MemeVote;
