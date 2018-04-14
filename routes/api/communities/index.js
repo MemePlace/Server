@@ -62,7 +62,7 @@ router.get('/', async (req, res) => {
  * Retrieves community details
  */
 router.get('/:name', async (req, res) => {
-    const name = req.params.name;
+    const name = req.params.name || '';
 
     const community = await models.Community.findOne({
         where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('name')), name.toLowerCase()),
@@ -85,7 +85,7 @@ router.get('/:name', async (req, res) => {
  */
 router.put('/:name/favourite', auth.isAuthenticated, async (req, res) => {
     // get community
-    const name = req.params.name;
+    const name = req.params.name || '';
 
     const community = await models.Community.findOne({
         where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('name')), name.toLowerCase()),
@@ -110,7 +110,7 @@ router.put('/:name/favourite', auth.isAuthenticated, async (req, res) => {
  */
 router.delete('/:name/favourite', auth.isAuthenticated, async (req, res) => {
     // get community
-    const name = req.params.name;
+    const name = req.params.name || '';
 
     const community = await models.Community.findOne({
         where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('name')), name.toLowerCase())
@@ -152,7 +152,7 @@ router.get('/:name/templates', async (req, res) => {
     const count = (0 < parseInt(req.query.count) && parseInt(req.query.count) < 100) ? parseInt(req.query.count) : 10;
     const offset = parseInt(req.query.offset) || 0;
 
-    const name = req.params.name;
+    const name = req.params.name || '';
 
     const community = await models.Community.findOne({
         where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('name')), name.toLowerCase())
@@ -177,7 +177,7 @@ router.get('/:name/templates', async (req, res) => {
  * Checks if community url is taken
  */
 router.get('/:name/exists', async (req, res) => {
-    const name = req.params.name;
+    const name = req.params.name || '';
 
     const exists = await models.Community.findOne({
         where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('name')), name.toLowerCase())
