@@ -220,4 +220,43 @@ router.delete('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
     res.json({message: 'Vote deleted'})
 });
 
+/**
+ * Add a comment to a meme
+ */
+router.put('/:memeid/comment', auth.isAuthenticated, async (req, res) => {
+    const memeId = req.params.memeid;
+
+    const meme = await models.Meme.findOne({
+        where: {
+            id: memeId
+        }
+    });
+
+    if (!meme) {
+        return res.status(400).json({error: 'Failed to find this meme'});
+    }
+
+    models.Comment.create({
+        // title: req.body.title,
+        // creatorId: req.session.userId,
+        // Image: {
+        //     link: req.body.link,
+        //     width: req.body.width,
+        //     height: req.body.height
+        // },
+        // TemplateId: parseInt(req.body.templateId) || null,
+        // CommunityId: community.id,
+        text: req.body.text,
+    }, {
+        include: [models.Image]
+    }).then((meme) => {
+        res.json(meme);
+    }).catch((err) => {
+        console.error(err);
+        const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to create meme';
+        res.status(400).json({error: msg});
+    });
+
+});
+
 module.exports = router;
