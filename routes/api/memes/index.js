@@ -164,7 +164,7 @@ router.put('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
 
     if (vote) {
         if (vote.diff === userVote) {
-            res.status(401).json({error: 'You have already voted for this meme'});
+            res.status(400).json({error: 'You have already voted for this meme'});
             return;
         }
 
