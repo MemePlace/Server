@@ -8,20 +8,30 @@ const router = express.Router();
 /**
  * Creates meme
  */
-router.post('/', auth.isAuthenticated, (req, res) => {
-   const communityId = parseInt(req.body.communityId) || null;
+router.post('/', auth.isAuthenticated, async (req, res) => {
+    const communityName = req.body.communityName || '';
 
-   if (communityId === null) {
-       res.status(400).json({error: 'Community cannot be null'});
-       return;
-   }
+    const community = await models.Community.findOne({
+        where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('name')), 
+            communityName.toLowerCase())
+    });
+
+    if (!community) {
+        return res.status(400).json({error: 'Failed to find the community'});
+    }
 
    models.Meme.create({
         title: req.body.title,
-        link: req.body.link,
         creatorId: req.session.userId,
+        Image: {
+            link: req.body.link,
+            width: req.body.width,
+            height: req.body.height
+        },
         TemplateId: parseInt(req.body.templateId) || null,
-        CommunityId: communityId,
+        CommunityId: community.id,
+   }, {
+       include: [models.Image]
    }).then((meme) => {
        res.json(meme);
    }).catch((err) => {
@@ -35,17 +45,29 @@ router.post('/', auth.isAuthenticated, (req, res) => {
  * Gets lists of memes
  */
 router.get('/', async (req, res) => {
-    const sort = (['top', 'new'].includes(req.query.sort) && req.query.sort) || 'top';
+    const sort = (['top', 'new'].includes(req.query.sort) && req.query.sort) || 'new';
     const count = (0 < parseInt(req.query.count) && parseInt(req.query.count) < 100) ? parseInt(req.query.count) : 10;
     const offset = parseInt(req.query.offset) || 0;
 
-    const result = await utils.getMemes(sort, count, offset);
+    let order = ['createdAt', 'DESC'];
+
+    if (sort === 'top') {
+        order = ['totalVote', 'DESC']
+    }
+
+    const totalCount = await models.Meme.count();
+
+    const memes = await models.Meme.findAll({
+        attributes: ['id'],
+        limit: count,
+        offset,
+        order: [order]
+    });
 
     res.json({
-        memes: result.memes,
-        totalCount: result.totalCount,
+        memes,
+        totalCount,
         offset,
-        size: result.memes.length,
         sort
     })
 });
@@ -67,16 +89,12 @@ router.get('/:memeid', async (req, res) => {
         }, {
             model: models.Community,
             attributes: ['name']
+        }, {
+            model: models.Image
         }]
     });
 
     if (meme) {
-        const totalVote = await models.MemeVote.sum('diff', {
-            where: {
-                MemeId: memeId
-            }
-        });
-
         const myVote = await models.MemeVote.findOne({
             where: {
                 MemeId: memeId,
@@ -86,7 +104,6 @@ router.get('/:memeid', async (req, res) => {
         });
 
         const m = meme.toJSON();
-        m.totalVote = totalVote;
         m.myVote = myVote;
 
         res.json(m);
@@ -151,15 +168,18 @@ router.put('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
             return;
         }
 
-        vote.diff = userVote;
+        //vote.diff = userVote;
 
-        await vote.save().catch((err) => {
+        await vote.update({
+            diff: userVote
+        }).then(() => {
+            res.json(vote);
+            //res.json("Successfully updated vote");
+        }).catch((err) => {
             console.error(err);
-            const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to create meme';
+            const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to update vote';
             res.status(400).json({error: msg});
         });
-
-        res.json({message: 'Updated vote status for this meme'});
     }
     else {
         models.MemeVote.create({
@@ -169,7 +189,7 @@ router.put('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
         }).then((newVote) => {
             res.json(newVote);
         }).catch((err) => {
-            const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to vote for this meme';
+            const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to create a vote for this meme';
             res.status(400).json({error: msg});
         });
     }

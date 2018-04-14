@@ -11,9 +11,15 @@ const router = express.Router();
 router.post('/', auth.isAuthenticated, (req, res) => {
     models.Template.create({
         title: req.body.title,
-        previewLink: req.body.previewLink,
+        Image: {
+            link: req.body.previewLink,
+            width: req.body.previewWidth,
+            height: req.body.previewHeight
+        },
         serialized: req.body.serialized,
         creatorId: req.session.userId,
+    }, {
+        include: [models.Image]
     }).then((template) => {
         res.json(template);
     }).catch((err) => {
@@ -96,6 +102,8 @@ router.get('/:id', async (req, res) => {
             model: models.User,
             as: 'creator',
             attributes: ['username']
+        }, {
+            model: models.Image
         }],
     });
 

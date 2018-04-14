@@ -27,13 +27,14 @@ exports.getTemplates = async function(sort, count, offset, communityId) {
     let options = {
         attributes: [
             'title',
-            'previewLink',
             'createdAt',
         ],
         include: [{
             model: models.User,
             as: 'creator',
             attributes: ['username'],
+        }, {
+            model: models.Image,
         }],
         limit: count,
         offset,
@@ -76,8 +77,4 @@ exports.getTemplates = async function(sort, count, offset, communityId) {
         totalCount: result.count.length,
         templates: result.rows
     };
-};
-
-exports.getMemes = async function(sort, count, offset) {
-
 };
