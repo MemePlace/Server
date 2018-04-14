@@ -4,6 +4,10 @@ module.exports = (sequelize, DataTypes) => {
         totalVote: {
             type: DataTypes.INTEGER,
             defaultValue: 0
+        },
+        hotScore: {
+            type: DataTypes.FLOAT,
+            defaultValue: 0
         }
     }, {
         indexes: [
