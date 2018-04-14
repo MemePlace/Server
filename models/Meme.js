@@ -1,6 +1,10 @@
 module.exports = (sequelize, DataTypes) => {
     const Meme = sequelize.define('Meme', {
         title: DataTypes.STRING,
+        totalVote: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0
+        }
     }, {
         indexes: [
             // Link

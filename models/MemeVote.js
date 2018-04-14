@@ -15,6 +15,67 @@ module.exports = (sequelize, DataTypes) => {
         // associations
         models.MemeVote.belongsTo(models.Meme);
         models.MemeVote.belongsTo(models.User);
+
+
+        MemeVote.beforeUpdate( (memeVote, options) => {
+            if (memeVote.diff === 1){
+                models.Meme.update({
+                    totalVote: sequelize.literal('totalVote + 2')
+                }, {
+                    where: {
+                        id: memeVote.MemeId
+                    }
+                })
+            }else {
+                models.Meme.update({
+                    totalVote: sequelize.literal('totalVote - 2')
+                }, {
+                    where: {
+                        id: memeVote.MemeId
+                    }
+                })
+            }
+        });
+
+        MemeVote.afterCreate( (memeVote, options) => {
+            if (memeVote.diff === 1){
+                models.Meme.update({
+                    totalVote: sequelize.literal('totalVote + 1')
+                }, {
+                    where: {
+                        id: memeVote.MemeId
+                    }
+                })
+            }else {
+                models.Meme.update({
+                    totalVote: sequelize.literal('totalVote - 1')
+                }, {
+                    where: {
+                        id: memeVote.MemeId
+                    }
+                })
+            }
+        });
+
+        MemeVote.beforeDestroy( (memeVote, options) => {
+            if (memeVote.diff === 1){
+                models.Meme.update({
+                    totalVote: sequelize.literal('totalVote - 1')
+                }, {
+                    where: {
+                        id: memeVote.MemeId
+                    }
+                })
+            }else {
+                models.Meme.update({
+                    totalVote: sequelize.literal('totalVote + 1')
+                }, {
+                    where: {
+                        id: memeVote.MemeId
+                    }
+                })
+            }
+        });
     };
 
     return MemeVote;
