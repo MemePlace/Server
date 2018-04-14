@@ -9,7 +9,7 @@ const router = express.Router();
  * Creates meme
  */
 router.post('/', auth.isAuthenticated, async (req, res) => {
-    const communityName = req.body.communityName;
+    const communityName = req.body.communityName || '';
 
     const community = await models.Community.findOne({
         where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('name')), 
@@ -164,7 +164,7 @@ router.put('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
 
     if (vote) {
         if (vote.diff === userVote) {
-            res.status(401).json({error: 'You have already voted for this meme'});
+            res.status(400).json({error: 'You have already voted for this meme'});
             return;
         }
 
