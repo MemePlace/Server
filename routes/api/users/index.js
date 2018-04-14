@@ -57,7 +57,7 @@ router.get('/:username', async (req, res) => {
  * Check if username is taken
  */
 router.get('/:username/exists', async (req, res) => {
-   const username = req.params.username; 
+   const username = req.params.username || ''; 
 
    const exists = await models.User.findOne({
       where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('username')), username.toLowerCase())
