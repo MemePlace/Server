@@ -45,7 +45,7 @@ router.post('/', auth.isAuthenticated, async (req, res) => {
         await meme.reload();
 
         res.json(meme);
-    } catch(e) {
+    } catch(err) {
         console.error(err);
         const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to create meme';
         res.status(400).json({error: msg});
