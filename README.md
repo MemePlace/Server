@@ -112,6 +112,18 @@ Votes for a meme
 
 Deletes a vote for a meme
 
+### `PUT /v1/memes/:id/comment`
+
+Comment on a meme
+
+- `text` - The comment for the meme (string of length 1-1000)
+
+### `DELETE /v1/memes/:id/comment`
+
+Delete a comment on a meme
+
+- `id` - The unique comment id
+
 ### `POST /v1/templates`
 
 Creates new template

@@ -245,26 +245,50 @@ router.put('/:memeid/comment', auth.isAuthenticated, async (req, res) => {
     }
 
     models.Comment.create({
-        // title: req.body.title,
-        // creatorId: req.session.userId,
-        // Image: {
-        //     link: req.body.link,
-        //     width: req.body.width,
-        //     height: req.body.height
-        // },
-        // TemplateId: parseInt(req.body.templateId) || null,
-        // CommunityId: community.id,
         text: req.body.text,
-    }, {
-        include: [models.Image]
-    }).then((meme) => {
-        res.json(meme);
+        UserId: req.session.userId,
+        MemeId: memeId,
+    }).then((comment) => {
+        res.json(comment);
     }).catch((err) => {
         console.error(err);
-        const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to create meme';
+        const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to post comment';
         res.status(400).json({error: msg});
     });
 
+});
+
+/**
+ * Delete a comment from a meme
+ */
+router.delete('/:memeid/comment', auth.isAuthenticated, async (req, res) => {
+    const memeId = req.params.memeid;
+
+    const meme = await models.Meme.findOne({
+        where: {
+            id: memeId
+        }
+    });
+
+    if (!meme) {
+        return res.status(400).json({error: 'Failed to find this meme'});
+    }
+
+    const comment = await models.Comment.findOne({
+        where: {
+            MemeId: memeId,
+            UserId: req.session.userId,
+            id: req.body.id,
+        }
+    });
+
+    if (!comment) {
+        return res.status(400).json({error: 'Failed to find comment'});
+    }
+
+    await comment.destroy();
+
+    res.json({message: 'Comment deleted'})
 });
 
 module.exports = router;
