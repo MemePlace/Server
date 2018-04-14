@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
         ],
         defaultScope: {
             attributes: {
-                exclude: ['updatedAt', 'CommunityId', 'creatorId']
+                exclude: ['updatedAt', 'CommunityId', 'creatorId', 'hotScore']
             }
         }
     });
