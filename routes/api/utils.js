@@ -88,6 +88,9 @@ exports.getMemes = async function(sort, count, offset, communityId) {
     else if (sort === 'new') {
         order = ['createdAt', 'DESC']
     }
+    else if (sort === 'hot') {
+        order = ['hotScore', 'DESC']
+    }
     else {
         throw new Error('Improper sort parameter given');
     }
