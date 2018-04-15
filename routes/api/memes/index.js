@@ -237,7 +237,11 @@ router.get('/:memeid/comments', async (req, res) => {
         where: {
             memeId: req.params.memeid
         },
-        attributes: ['id', 'text'],
+        include: [{
+            model: models.User,
+            attributes: ['id', 'username']
+        }],
+        attributes: ['id', 'User.username', 'text'],
         order: [order]
     });
 
