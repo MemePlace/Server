@@ -78,3 +78,49 @@ exports.getTemplates = async function(sort, count, offset, communityId) {
         templates: result.rows
     };
 };
+
+exports.getMemes = async function(sort, count, offset, communityId) {
+    let order;
+
+    if (sort === 'top') {
+        order = ['totalVote', 'DESC'];
+    }
+    else if (sort === 'new') {
+        order = ['createdAt', 'DESC']
+    }
+    else if (sort === 'hot') {
+        order = ['hotScore', 'DESC']
+    }
+    else {
+        throw new Error('Improper sort parameter given');
+    }
+
+    const options = {
+        limit: count,
+        offset,
+        order: [order],
+        include: [{
+            model: models.User,
+            as: 'creator',
+            attributes: ['username']
+        }, {
+            model: models.Community,
+            attributes: ['name']
+        }, {
+            model: models.Image
+        }]
+    };
+
+    if (communityId) {
+        options.where = {
+            CommunityId: communityId
+        };
+    }
+
+    const result = await models.Meme.findAndCountAll(options);
+
+    return {
+        totalCount: result.count,
+        memes: result.rows,
+    };
+};
