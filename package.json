@@ -7,6 +7,7 @@
     "body-parser": "^1.18.2",
     "bcrypt": "^1.0.3",
     "sequelize": "^4.36.1",
+    "connect-session-sequelize": "^5.2.1",
     "sqlite3": "^3.1.13"
   },
   "devDependencies": {

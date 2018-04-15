@@ -3,6 +3,7 @@ const models = require('./models');
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
 const APIv1 = require('./routes/api/v1');
 const app = express();
 
@@ -49,6 +50,12 @@ app.use((req, res, next) => {
         next();
     }
 });
+
+config.session.store = new SequelizeStore({
+    db: models.sequelize,
+    disableTouch: true
+});
+
 app.use(session(config.session));
 app.use('/api/v1', APIv1);
 
