@@ -20,7 +20,7 @@ router.post('/', auth.isAuthenticated, async (req, res) => {
         return res.status(400).json({error: 'Failed to find the community'});
     }
 
-   models.Meme.create({
+    models.Meme.create({
         title: req.body.title,
         creatorId: req.session.userId,
         Image: {
@@ -30,15 +30,15 @@ router.post('/', auth.isAuthenticated, async (req, res) => {
         },
         TemplateId: parseInt(req.body.templateId) || null,
         CommunityId: community.id,
-   }, {
-       include: [models.Image]
-   }).then((meme) => {
-       res.json(meme);
-   }).catch((err) => {
-       console.error(err);
-       const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to create meme';
-       res.status(400).json({error: msg});
-   });
+    }, {
+        include: [models.Image]
+    }).then((meme) => {
+        res.json(meme);
+    }).catch((err) => {
+        console.error(err);
+        const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to create meme';
+        res.status(400).json({error: msg});
+    });
 });
 
 /**
@@ -49,27 +49,15 @@ router.get('/', async (req, res) => {
     const count = (0 < parseInt(req.query.count) && parseInt(req.query.count) < 100) ? parseInt(req.query.count) : 10;
     const offset = parseInt(req.query.offset) || 0;
 
-    let order = ['createdAt', 'DESC'];
-
-    if (sort === 'top') {
-        order = ['totalVote', 'DESC']
-    }
-
-    const totalCount = await models.Meme.count();
-
-    const memes = await models.Meme.findAll({
-        attributes: ['id'],
-        limit: count,
-        offset,
-        order: [order]
-    });
+    const result = await utils.getMemes(sort, count, offset);
 
     res.json({
-        memes,
-        totalCount,
+        memes: result.memes,
+        totalCount: result.totalCount,
         offset,
-        sort
-    })
+        sort,
+        size: result.memes.length,
+    });
 });
 
 /**
