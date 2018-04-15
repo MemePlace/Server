@@ -117,8 +117,7 @@ exports.getMemes = async function(req, sort, count, offset, communityId) {
             model: models.MemeVote,
             attributes: ['diff'],
             where: {
-                UserId: req.session.userId,
-                MemeId: models.sequelize.literal('Meme.id')
+                UserId: req.session.userId
             },
             required: false
         });
