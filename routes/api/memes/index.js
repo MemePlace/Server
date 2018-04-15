@@ -20,32 +20,45 @@ router.post('/', auth.isAuthenticated, async (req, res) => {
         return res.status(400).json({error: 'Failed to find the community'});
     }
 
-    models.Meme.create({
-        title: req.body.title,
-        creatorId: req.session.userId,
-        Image: {
-            link: req.body.link,
-            width: req.body.width,
-            height: req.body.height
-        },
-        TemplateId: parseInt(req.body.templateId) || null,
-        CommunityId: community.id,
-    }, {
-        include: [models.Image]
-    }).then((meme) => {
+    try {
+        const meme = await models.Meme.create({
+            title: req.body.title,
+            creatorId: req.session.userId,
+            Image: {
+                link: req.body.link,
+                width: req.body.width,
+                height: req.body.height
+            },
+            TemplateId: parseInt(req.body.templateId) || null,
+            CommunityId: community.id,
+        }, {
+            include: [models.Image]
+        });
+
+
+        // The user votes for this meme automatically
+        await models.MemeVote.create({
+            diff: 1,
+            MemeId: meme.id,
+            UserId: req.session.userId
+        });
+
+        // fetch new details for the meme
+        await meme.reload();
+
         res.json(meme);
-    }).catch((err) => {
+    } catch(err) {
         console.error(err);
         const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to create meme';
         res.status(400).json({error: msg});
-    });
+    }
 });
 
 /**
  * Gets lists of memes
  */
 router.get('/', async (req, res) => {
-    const sort = (['top', 'new'].includes(req.query.sort) && req.query.sort) || 'new';
+    const sort = (['top', 'new', 'hot'].includes(req.query.sort) && req.query.sort) || 'hot';
     const count = (0 < parseInt(req.query.count) && parseInt(req.query.count) < 100) ? parseInt(req.query.count) : 10;
     const offset = parseInt(req.query.offset) || 0;
 
@@ -156,13 +169,10 @@ router.put('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
             return;
         }
 
-        //vote.diff = userVote;
-
         await vote.update({
             diff: userVote
         }).then(() => {
             res.json(vote);
-            //res.json("Successfully updated vote");
         }).catch((err) => {
             console.error(err);
             const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to update vote';

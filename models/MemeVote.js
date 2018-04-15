@@ -1,3 +1,5 @@
+const utils = require('../utils');
+
 module.exports = (sequelize, DataTypes) => {
     const MemeVote = sequelize.define('MemeVote', {
         diff: {
@@ -12,36 +14,29 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     MemeVote.associate = function(models) {
+        async function updateScore(difference, memeId) {
+            const meme = await models.Meme.findOne({where: {id: memeId}});
+
+            if (!meme) {
+                return;
+            }
+
+            const newTotalScore = meme.totalVote + difference;
+            const newHotScore = utils.hotScore(newTotalScore, meme.createdAt);
+
+            await meme.update({
+                totalVote: sequelize.literal(`totalVote ${difference >= 0 ? '+': ''} ${difference}`),
+                hotScore: newHotScore
+            });
+        }
+
         // associations
         models.MemeVote.belongsTo(models.Meme);
         models.MemeVote.belongsTo(models.User);
 
-        MemeVote.beforeUpdate((memeVote, options) =>
-            models.Meme.update({
-                totalVote: sequelize.literal(`totalVote ${memeVote.diff === 1 ? '+': '-'} 2`)
-            }, {
-                where: {
-                    id: memeVote.MemeId
-                }
-            }));
-
-        MemeVote.afterCreate((memeVote, options) =>
-            models.Meme.update({
-                totalVote: sequelize.literal(`totalVote ${memeVote.diff === 1 ? '+': '-'} 1`)
-            }, {
-                where: {
-                    id: memeVote.MemeId
-                }
-            }));
-
-        MemeVote.beforeDestroy((memeVote, options) =>
-            models.Meme.update({
-                totalVote: sequelize.literal(`totalVote ${memeVote.diff === 1 ? '-': '+'} 1`)
-            }, {
-                where: {
-                    id: memeVote.MemeId
-                }
-            }));
+        MemeVote.beforeUpdate((memeVote) => updateScore((memeVote.diff === 1) ? 2 : -2, memeVote.MemeId));
+        MemeVote.afterCreate((memeVote) => updateScore((memeVote.diff === 1) ? 1 : -1, memeVote.MemeId));
+        MemeVote.beforeDestroy((memeVote) => updateScore((memeVote.diff === 1) ? -1 : 1, memeVote.MemeId));
     };
 
     return MemeVote;

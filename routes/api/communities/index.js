@@ -137,7 +137,7 @@ router.delete('/:name/favourite', auth.isAuthenticated, async (req, res) => {
  * Retrieves memes in community
  */
 router.get('/:name/memes', async (req, res) => {
-    const sort = (['top', 'new'].includes(req.query.sort) && req.query.sort) || 'new';
+    const sort = (['top', 'new', 'hot'].includes(req.query.sort) && req.query.sort) || 'hot';
     const count = (0 < parseInt(req.query.count) && parseInt(req.query.count) < 100) ? parseInt(req.query.count) : 10;
     const offset = parseInt(req.query.offset) || 0;
 
