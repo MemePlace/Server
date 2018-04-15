@@ -53,5 +53,30 @@ router.get('/:username', async (req, res) => {
         res.status(400).json({error: 'Failed to retrieve user'});
     }
 });
+/**
+ * Check if username is taken
+ */
+router.get('/:username/exists', async (req, res) => {
+   const username = req.params.username || ''; 
+
+   const exists = await models.User.findOne({
+      where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('username')), username.toLowerCase())
+   });
+
+   res.json({exists: !!exists});
+});
+
+/**
+ * Check if email is taken
+ */
+router.get('/:email/exists', async (req, res) => {
+   const email = req.params.email || ''; 
+
+   const exists = await models.User.findOne({
+      where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('email')), email.toLowerCase())
+   });
+
+   res.json({exists: !!exists});
+});
 
 module.exports = router;
