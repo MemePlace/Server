@@ -136,12 +136,30 @@ router.delete('/:name/favourite', auth.isAuthenticated, async (req, res) => {
 /**
  * Retrieves memes in community
  */
-router.get('/:name/memes', (req, res) => {
-    const sort = req.query.sort || 'top';
-    const after = req.query.after;
-    const count = req.query.count || 10;
+router.get('/:name/memes', async (req, res) => {
+    const sort = (['top', 'new', 'hot'].includes(req.query.sort) && req.query.sort) || 'hot';
+    const count = (0 < parseInt(req.query.count) && parseInt(req.query.count) < 100) ? parseInt(req.query.count) : 10;
+    const offset = parseInt(req.query.offset) || 0;
 
-    // TODO
+    const name = req.params.name || '';
+
+    const community = await models.Community.findOne({
+        where: models.sequelize.where(models.sequelize.fn('lower', models.sequelize.col('name')), name.toLowerCase())
+    });
+
+    if (!community) {
+        return res.status(400).json({error: 'Failed to find the community'});
+    }
+
+    const result = await utils.getMemes(sort, count, offset, community.id);
+
+    res.json({
+        memes: result.memes,
+        totalCount: result.totalCount,
+        offset,
+        sort,
+        size: result.memes.length,
+    });
 });
 
 /**
