@@ -79,7 +79,7 @@ exports.getTemplates = async function(sort, count, offset, communityId) {
     };
 };
 
-exports.getMemes = async function(sort, count, offset, communityId) {
+exports.getMemes = async function(req, sort, count, offset, communityId) {
     let order;
 
     if (sort === 'top') {
@@ -108,8 +108,21 @@ exports.getMemes = async function(sort, count, offset, communityId) {
             attributes: ['name']
         }, {
             model: models.Image
-        }]
+        }],
+        subQuery: false,
     };
+
+    if (req.session.userId) {
+        options.include.push({
+            model: models.MemeVote,
+            attributes: ['diff'],
+            where: {
+                UserId: req.session.userId,
+                MemeId: models.sequelize.literal('Meme.id')
+            },
+            required: false
+        });
+    }
 
     if (communityId) {
         options.where = {
@@ -118,9 +131,20 @@ exports.getMemes = async function(sort, count, offset, communityId) {
     }
 
     const result = await models.Meme.findAndCountAll(options);
+    const rows = result.rows;
+
+    rows.forEach((row) => {
+        if (row.dataValues.MemeVotes) {
+            if (row.dataValues.MemeVotes.length > 0) {
+                row.dataValues.myVote = row.dataValues.MemeVotes[0];
+            }
+
+            delete row.dataValues.MemeVotes;
+        }
+    });
 
     return {
         totalCount: result.count,
-        memes: result.rows,
+        memes: rows,
     };
 };
