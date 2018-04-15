@@ -241,7 +241,7 @@ router.get('/:memeid/comments', async (req, res) => {
             model: models.User,
             attributes: ['id', 'username']
         }],
-        attributes: ['id', 'User.username', 'text'],
+        attributes: ['id', 'User.username', 'createdAt', 'text'],
         order: [order]
     });
 
