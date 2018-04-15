@@ -112,6 +112,20 @@ Votes for a meme
 
 Deletes a vote for a meme
 
+### `GET /v1/memes/:id/comments`
+
+Get all comments for a meme (given as id and text pairs)
+
+### `POST /v1/memes/:id/comments`
+
+Comment on a meme
+
+- `text` - The comment for the meme (string of length 1-1000)
+
+### `DELETE /v1/memes/:id/comments/:commentid`
+
+Delete a comment on a meme
+
 ### `POST /v1/templates`
 
 Creates new template

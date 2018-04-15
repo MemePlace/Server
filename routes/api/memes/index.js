@@ -226,4 +226,87 @@ router.delete('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
     res.json({message: 'Vote deleted'})
 });
 
+/**
+ * Gets list of comments for a meme
+ */
+router.get('/:memeid/comments', async (req, res) => {
+
+    let order = ['createdAt', 'ASC'];
+
+    const comments = await models.Comment.findAll({
+        where: {
+            memeId: req.params.memeid
+        },
+        attributes: ['id', 'text'],
+        order: [order]
+    });
+
+    res.json({
+        comments
+    });
+});
+
+/**
+ * Add a comment to a meme
+ */
+router.post('/:memeid/comments', auth.isAuthenticated, async (req, res) => {
+    const memeId = req.params.memeid;
+
+    const meme = await models.Meme.findOne({
+        where: {
+            id: memeId
+        }
+    });
+
+    if (!meme) {
+        return res.status(400).json({error: 'Failed to find this meme'});
+    }
+
+    models.Comment.create({
+        text: req.body.text,
+        UserId: req.session.userId,
+        MemeId: memeId,
+    }).then((comment) => {
+        res.json(comment);
+    }).catch((err) => {
+        console.error(err);
+        const msg = (err && err.errors && err.errors[0] && err.errors[0].message) || 'Failed to post comment';
+        res.status(400).json({error: msg});
+    });
+
+});
+
+/**
+ * Delete a comment from a meme
+ */
+router.delete('/:memeid/comments/:commentid', auth.isAuthenticated, async (req, res) => {
+    const memeId = req.params.memeid;
+
+    const meme = await models.Meme.findOne({
+        where: {
+            id: memeId
+        }
+    });
+
+    if (!meme) {
+        return res.status(400).json({error: 'Failed to find this meme'});
+    }
+
+    const comment = await models.Comment.findOne({
+        where: {
+            MemeId: memeId,
+            UserId: req.session.userId,
+            id: req.params.commentid,
+        }
+    });
+
+    if (!comment) {
+        return res.status(400).json({error: 'Failed to find comment'});
+    }
+
+    await comment.destroy();
+
+    res.json({message: 'Comment deleted'})
+});
+
 module.exports = router;
