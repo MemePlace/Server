@@ -151,7 +151,7 @@ router.get('/:name/memes', async (req, res) => {
         return res.status(400).json({error: 'Failed to find the community'});
     }
 
-    const result = await utils.getMemes(sort, count, offset, community.id);
+    const result = await utils.getMemes(req, sort, count, offset, community.id);
 
     res.json({
         memes: result.memes,

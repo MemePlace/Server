@@ -25,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
         models.Meme.belongsTo(models.Template);
         models.Meme.belongsTo(models.Community);
         models.Meme.belongsTo(models.Image);
+        models.Meme.hasMany(models.MemeVote);
     };
 
     return Meme;

@@ -62,7 +62,7 @@ router.get('/', async (req, res) => {
     const count = (0 < parseInt(req.query.count) && parseInt(req.query.count) < 100) ? parseInt(req.query.count) : 10;
     const offset = parseInt(req.query.offset) || 0;
 
-    const result = await utils.getMemes(sort, count, offset);
+    const result = await utils.getMemes(req, sort, count, offset);
 
     res.json({
         memes: result.memes,
