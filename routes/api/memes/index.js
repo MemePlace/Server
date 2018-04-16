@@ -231,7 +231,7 @@ router.delete('/:memeid/vote', auth.isAuthenticated, async (req, res) => {
  */
 router.get('/:memeid/comments', async (req, res) => {
 
-    let order = ['createdAt', 'ASC'];
+    let order = ['createdAt', 'DESC'];
 
     const comments = await models.Comment.findAll({
         where: {
