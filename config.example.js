@@ -1,5 +1,4 @@
 module.exports = {
-    port: 3000,
     db: {
         dialect: 'sqlite',
         storage: 'db.sqlite',
@@ -12,6 +11,16 @@ module.exports = {
     },
     bcrypt: {
         saltRounds: 10,
+    },
+    http: {
+        enable: true,
+        port: 3000,
+    },
+    https: {
+        enable: false,
+        port: 443,
+        privateKey: 'key.pem',
+        certificate: 'cert.pem',
     },
     allowedOrigins: ['http://localhost:4200', 'http://meme.place'],
     ensureOrigin: false, // Ensure origin is in allowedOrigins

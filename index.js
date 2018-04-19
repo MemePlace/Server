@@ -1,3 +1,6 @@
+const fs = require('fs');
+const http = require('http');
+const https = require('https');
 const config = require('./config.js');
 const models = require('./models');
 const express = require('express');
@@ -59,11 +62,23 @@ config.session.store = new SequelizeStore({
 app.use(session(config.session));
 app.use('/api/v1', APIv1);
 
-const port = config.port || 3000;
+let key, cert;
+
+if (config.https && config.https.enable) {
+    key  = fs.readFileSync(config.https.privateKey, 'utf8');
+    cert = fs.readFileSync(config.https.certificate, 'utf8');
+}
 
 // Ensure DB schema
 models.sequelize.sync().then(() => {
-    app.listen(port, () => {
-        console.log(`Server listening on port ${port}`);
-    });
+    if ((config.http && config.http.enable) || config.port) {
+        const port = (config.http && config.http.port) || config.port;
+
+        http.createServer(app).listen(port);
+        console.log(`HTTP Server listening on port ${port}`)
+    }
+    if (config.https && config.https.enable) {
+        https.createServer({key, cert}, app).listen(config.https.port);
+        console.log(`HTTPS Server listening on port ${config.https.port}`)
+    }
 });
